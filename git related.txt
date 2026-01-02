@@ -1,5 +1,24 @@
 https://claude.ai/chat/24cff82a-e6fa-432c-b228-1c3185472c07 --> how to push a project created on pc to a online repo
 
+OR just do
+Initialize git in your project (if not already done):
+--> git init
+
+Add your files to git:
+--> git add .
+
+Make your first commit:
+--> git commit -m "Initial commit"
+
+Add your GitHub repository as the remote origin:
+--> git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
+
+Push your code to GitHub:
+--> git branch -M main
+--> git push -u origin main
+
+Note: If your default branch is called "master" instead of "main", use master in the commands above.
+--------------------------------------------------------------------------------------------------------------------------
 git --version 
 git --list //tells about username and other things
 pwd .. tells about current working directory
