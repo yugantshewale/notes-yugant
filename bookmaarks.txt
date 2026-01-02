@@ -1,0 +1,112 @@
+https://www.learncpp.com/cpp-tutorial/user-defined-namespaces-and-the-scope-resolution-operator/
+https://codeforces.com/problemset/problem/2004/C
+https://www.youtube.com/watch?v=LBTIqRU1e1Q&t=704s
+file:///C:/Users/ADMIN/Desktop/Mstat/Math/real%20analysis/2%20Stephen%20Abbott_real%20analysis%20ch%20_2_4_5_7.pdf
+file:///C:/Users/ADMIN/Desktop/Mstat/Math/real%20analysis/stephen%20abbott%20solution.pdf
+https://www.hackerrank.com/domains/sql
+https://chatgpt.com/c/683fe62f-c930-8002-86e3-cd40b9376990
+https://chatgpt.com/c/683fe62f-c930-8002-86e3-cd40b9376990
+https://chatgpt.com/c/686a3fc5-05d4-8002-b0c4-c073b5a0bdc8 (math)
+https://chatgpt.com/c/68906254-891c-8002-b403-7f67cbfcac26 (cdf and pmf)
+https://chatgpt.com/c/689dc6b3-89a0-8333-92ef-fa5fa5b42f73
+https://chatgpt.com/c/68d40a0c-7ad4-832b-9373-194ceac81151 -->(backendrelated)
+https://chatgpt.com/c/693fca06-fd6c-8325-908f-7553bb5bdde1 -->(virtual memory vs logical memory shit and also related to some bytecode stuff)
+https://chatgpt.com/c/69425982-4038-8324-ad7d-6ff967367598 --> about tailwind styling and stuff
+https://chatgpt.com/c/6945122f-ec0c-8323-a48e-a8b640d140eb --> some django related stuff and some padding related
+https://chatgpt.com/c/694976bf-0f04-8324-926e-43b0c3a7eed0 --> some django logout stuff related helps in solid understand
+https://chatgpt.com/c/694fbe5d-a684-8321-b9e5-96828cebcdea --> Some stuff about dango queries and cheatsheet IMP very IMP
+https://chatgpt.com/c/69573a08-0880-8322-a592-d8894d5f0a15 --> also imp for creating venv and setting up django
+The interviewer started with networking then operating system then DBMS and at last DSA , each in depth along with many 
+questions in between .
+
+Difference between hashmap and map Give the real life example of polymorphism
+
+twosum, best time to buy stock and hashmap.
+
+ If you do the proper basic of CPP and Linux you can crack the IV very easily.
+ Technology on which interview was held is Linux and C++
+
+Online assessment had MCQ's on c++ and two coding questions 1) Merge Two Sorted Arrays 
+2) Minimum Taps to open to water garden
+
+Dynamic Programming based simple question and Data Structure based algorithmic question
+
+Mostly about modern C++ and some algorithms.
+
+https://www.geeksforgeeks.org/cpp-standards-and-implementations/
+
+https://chatgpt.com/c/68428f43-6500-8002-bb38-1a3ccef873d5
+
+• Cloud platforms (AWS, Azure, or GCP)
+• Containerization technologies (Docker, Kubernetes)
+• CI/CD pipelines and DevOps
+• Messaging systems (Kafka, RabbitMQ)
+• Contribution to open-source projects or personal side projects
+Preferable: Knowledge of database management tools like Liquibase / Hibernate
+ WPF, XAML and MVVM. 
+C#, .NET, Java, Springboot
+
+_____________
+Technical Expertise:
+
+Bachelor’s degree in computer science or a related technical field, or equivalent experience.
+Excellent Java knowledge with significant experience in Java programming.
+Excellent analytical skills and an understanding of data structures and algorithms.
+Experience with object-oriented software design and design patterns.
+Strong proficiency in Spring framework (Spring MVC) and Hibernate ORM.
+Proficient in Angular and TypeScript, with experience building responsive front ends.
+Working knowledge of RESTful API design and development
+Working knowledge of SQL, PostgreSQL or other relational databases.
+Proven understanding of CICD practices and experience with GitLab.
+Understanding of Generative AI concepts and applications
+Experience with data preprocessing and feature engineering
+Ability to work independently or with a team in a multifaceted environment.
+General Qualities:
+
+Excellent problem-solving and analytical skills.
+Strong attention to detail.
+Passion for staying up to date with the latest web development technologies.
+Preferred Qualifications
+
+Experience with automated testing frameworks (e.g., JUnit, Selenium).
+Familiarity with agile methodologies like Scrum or Kanban.
+
+ystem Design (Microservices)
+Task: Design a scalable system
+This was the most difficult round. I was tested on my High-Level Design knowledge, and I came out unscathed!
+Grilled On:
+Distributed system tradeoffs
+Cache strategies
+Pro Tip: Study CAP theorem + understanding of design tradeoffs.
+
+3️⃣ Spring Boot Code Review
+Twist: Debug and review a production-like API under 45 minutes.
+Spotted 17/21 bugs (missed 4 edge cases!)
+Secret Weapon: Spring Annotations, Profiles etc.
+
+4️ Behavioral (STAR Method)
+Questions:
+"When did you lead without authority?"
+"How do you handle conflicts?"
+My Hack: Prepped 10+ STAR stories
+
+Tell me about C++ memory storage; cache lines, false sharing, object memory overhead, cache locality, vector vs list, benchmarking and tooling for 
+benchmarking, interactions with the linux kernel like polling or io_uring
+
+Skills & Qualifications
+Must Have:
+● Strong programming skills in Python (NumPy, pandas, FastAPI/Flask, Plotly/Dash/Streamlit, Redis) and C++ .
+● Experience with frontend development (React, TypeScript, or similar) and UI/UX
+● Prior hands-on experience in Full-stack development and/or Quantitative Domain.
+● Solid understanding of databases (SQL/NoSQL) and data pipelines.
+● Familiarity with real-time systems (websockets, streaming APIs, message queues).
+● Experience with data structures, algorithms, and system design.
+● Strong problem-solving skills and a hunger to learn on the job.
+Nice to Have:
+● Prior experience or interest in financial markets/algo trading/quantitative research.
+● Exposure to DevOps/deployment/cloud infrastructure (AWS, Docker, etc.).
+● Exposure to TT ADL and/or experience developing algorithms via TT ADL.
+● Knowledge of options, futures, and market microstructure.
+
+Gadbad · Shreyas · The Siege · Rebel 7 · Vedang · Devoniàn · Shreyas Sagvekar · Siegen
+https://www.youtube.com/watch?v=yfVCzQUXkmc

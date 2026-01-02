@@ -1,0 +1,27 @@
+https://chatgpt.com/c/6935a0c5-3f28-8331-8d1e-d3d969203baa --> Route
+https://chatgpt.com/share/6936cf0e-e024-8002-860a-e2e839f06699
+https://chatgpt.com/c/69351d41-f478-8326-bed6-f95d6bf7e070 --> ServerSide rendering
+
+https://chatgpt.com/c/6931c5ad-7ff4-8320-9a2c-7c037f5a0a89 --> Axios interceptors
+https://chatgpt.com/share/6936dc43-79d8-8002-8b63-a1f2f367f9ac
+
+https://chatgpt.com/c/69306fd9-6b10-8321-aab6-4a8842290921 --> Timer Reset
+https://chatgpt.com/share/6936dc81-9d0c-8002-93c4-a3ae5a11b8fb
+
+https://chatgpt.com/c/692fdef1-d368-8324-9cc0-c8189e871548 --> useEffect hook
+https://chatgpt.com/c/692e6a4c-fcd8-8320-bc60-78c4d7ff6654 --> useEffect hook in react
+https://chatgpt.com/share/6936dcaf-656c-8002-8cf5-88ff14ac404b
+
+https://chatgpt.com/c/692d8f23-34e8-8321-8604-0059619484fa --> Conditional rendering
+
+https://chatgpt.com/c/692d463a-c8ac-8331-ac5f-0d808d6f3a80 --> Updater Function in useState IMP
+https://chatgpt.com/share/6936dd04-b934-8002-bcb8-40f15db18971
+
+https://chatgpt.com/c/692b3568-b5ec-8323-92b5-d1220ea8b1ef --> Primitive vs Objects
+
+https://chatgpt.com/c/693948bf-69bc-8331-9651-c77d7c9111e7 --> related to flexbox stuff
+https://chatgpt.com/share/693975a0-3a00-8002-a516-4b58f33e12d6
+
+https://chatgpt.com/c/6939707e-73d0-832f-9d32-2ecb9ce777b5 --> related to flexbox stuff 2
+https://chatgpt.com/share/693975ca-b19c-8002-8ea9-98f828368543
+

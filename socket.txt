@@ -1,0 +1,519 @@
+Architecture :
+The connection is alway between two devices, and each side uses its own IP and port number. Usually, one side is called
+the client, the other side the server.
+The server is continually waiting for incoming connections. This is called listening which is always done on a certain 
+IP and port number.
+Whilst the is layers will be the same for the two devices connected by the networks the roles and the tasks that these 
+two devices perform will differ in a client-server architecture.
+A server can have connections with more than one client and also a client can have connections with more than one server
+But the roles of a server is to listen out on a port number and a certain IP address for clients which could be more than
+one client attempting to send a request to connect to the server via that port number whilst the client and the server will
+share similar networking code in order to facilitate a connection between each other the server has the responsibilites of
+listening out for connections for the client and client can send requests to connect to a cetian ip and port number and 
+devices on the network are given their own uniue ip address so therefore if the sever and the client are connected on the 
+same local network then the network setup will allocate them a static iP address which will reflect the fact that they are
+in the same network but they will also be unique as well for each machine so that each machine can be identified by its unique
+IP address and machines on the network that are intending to maintain a constant connection with the server tend to be allocated
+static IP address meaning they won't change becuase there is no need for it to change if tis always going to be connected to 
+server however examples of dynamic IP allocation may be for wireless devices for example which may well join for a period of 
+time and then exit the network so that is in the case of a lan where there are mulitiple machine connected to a router
+But we will use same machine(for here our understanding) create one application for the server and then on the same machine have
+another application enacting the client so that they don't have to connect via a network they can go down the layers of the osi 
+model on the same device and it goes back again so we are gonna use loopback address which is 127.0.0.1 reffers to the current
+machine and you should find this is a reserved address for the particular machine and this will facilitate the connection 
+simulating the network of the course cuz it will still descend and ascend the osi layers but usefull just for testing it out
+on our machine first and saves us having to set up a network to connect different devices together
+But if you want to extend the pracitcals, so if you have router at home and have diff devices you could well try and configure the
+network so that you could run the server app on one machine and then get it to chat to the client app on a different machine via the 
+network but remeber that each device on the network has its own unique ip address so remember that you'll have to configure the app
+for that they won't be the same ip address in the practicals that we're going to do because we're working with one machine
+
+Ports :
+In networking, a port is a number that helps your computer identify which program or service should handle incoming or outgoing data.
+It’s like a label or ID used in communication. 
+When data comes to your computer, it uses the port number to know which software should receive it.
+For example:
+If you're browsing a website, your browser sends/receives data using port 80 (for HTTP) or port 443 (for HTTPS).
+If you're using SSH to connect to a server, it uses port 22.
+
+A port is just a 16-bit number (range: 0 to 65535).
+It’s used together with IP addresses.
+When you connect to a service, the connection is described by: <IP address>:<port number>
+Example: 192.168.0.10:443 → HTTPS connection to that IP.
+IP + Port together uniquely identify a program on a network.
+Ports 0–1023 are reserved for well-known services.
+Ports 49152–65535 are usually used as temporary or dynamic (ephemeral) ports by client programs.
+
+Port numbers (16 bit address) can be any integer between i and 65535 it is a 16 bit number. Ports 1...1023 are described as well knon
+ports and are reserved for specific applications (port 21 FTP)
+It is recommended to choose a number over 1023. To be be almost sure that your desired port isn't already in use
+
+Socket :
+Sockets are located in trasport layer of OSI model
+Socket is a pipe between two computers on a network through which data flows.
+Almost all WInsock functions operate on a socket as its's your handle to the connection.
+Bothe are also a  two-way , data can be both sent and received on a socket.
+When two devices (like your computer and a server) communicate over the internet (or any network), they do so by sending and receiving 
+data. A socket is the software piece that allows this sending and receiving to happen.
+It's like a doorway (not in analogy form 😄) in your computer’s operating system that lets a program send or receive data through a 
+specific IP address and port number.
+🧱 Technically, a socket is defined by:
+<IP address, Port number, Transport Protocol>
+IP Address: identifies the device on the network.
+Port Number: identifies the specific application/program.
+Transport Protocol: usually TCP or UDP.
+
+💡 Key Types of Sockets:
+| Type            | Used In                   | Protocol |
+| --------------- | ------------------------- | -------- |
+| Stream Socket   | Web, Email, File Transfer | TCP      |
+| Datagram Socket | Video games, VoIP, DNS    | UDP      |
+
+
+There are two common types for a socekts
+1. Streaming socket(SOCK_STREAM) TCP
+2. Datagram socket (SOCK_DGRAM) UDP
+
+🎯 TCP in Simple Words
+It’s like sending a registered parcel.
+You get confirmation that:
+The data is received.
+It's received in the correct order.
+If something gets lost, it’s re-sent.
+
+⚡ UDP in Simple Words
+It’s like shouting information quickly.
+You send data, but you:
+Don’t know if it reached.
+Don’t know if it came in order.
+Don’t retry sending if lost.
+
+A socket descriptor type - int
+********************************************************************************************************************************************************************************************
+How to create a socket for the server
+Create a socket : The server creates a new socket When created it is yet to be bound to an IP or port
+		  hence its status is unbounded
+
+Binding A socket : Bind the server to a valid IP address and port number. 
+		   That is when we bind this socket(newly created in above step) wht we're doing is we bind IP address
+		   and the port number to the socket itself now the status will be bound from unbound.
+		   eg : a socket with IP address : 192.168.1.1 and Port number : 55555 binded to it
+
+Listening : After the socket is bound, it is put into the listenin state, waiting for incoming connections on the port
+	    eg : here it is port 555555
+	    Here we are listening for incoming requests on those details so through that port number we'e listenin out for clients to connect to this
+	    socket through that port numer
+
+Client Socket : now lets say that a client in the same local network as the server (192.168.x.x) comes along and it wants to connect to the server
+		It creates its own socket. So the client is going to have to create its own sockets which the server did it starts as unbound and then 
+		when the details are added when it is bound, you will notice here that the IP address for the client is the same(for our case cuz its on same comp or else it would be diff)
+		but the port number would be different and client doesn't have any control over the port number this is allocated automatically for server it is specified.
+		
+Request a Connection :  The client socket tries to connect to the known IP address of the server
+		        What it can do is put out a reuest once its been bound so it can put out a request to connect to the port number of the server so even though it exists on its own
+			different port number it can put out a request to connect to the port number of the server. 
+			Once that request has been acknowledged and accepted by the server we don't just connect the two sockets but the server actually duplicates the socket to enable the
+			connection between the server and the client. We also maintain the original socket which is still listening out on that port for any other clients that may want to
+			connect to that port number. So the server can simultaneously maintain its connection with clients it just creates new socket for them as well as listing out for 
+			other clients attempting to connect to that socket.	
+			Some notes : The listening sockets sees some client wants to make a connection. It accepts it by creating a new socket bound to its own IP address and valid port.
+			From this point the client socked and the server connection socket just created will be able to communicate, while the listenin socket will keep listening for other
+			connections.
+********************************************************************************************************************************************************************************************
+Lets look how we can code such a process so for server this process maps out to seven individual steps they are
+Steps for SERVER : 
+1. Initalize WSA - WSAStartup()
+2. Create a socket - socket()
+3. Bind the socket - bind()
+4. Listen on the socket - listen()
+5. Accept a connection - accpet(), connect()
+6. Send and receive data - recv(), send(), recvform(), sendto()
+7. Disconnect - Disconnect()
+
+Steps for CLIENT :
+1. Initalize WSA - WSAStartup()
+2. Create a socket - socket()
+3. Connect to the server - connect()
+4. Send and receive data - recv(), send(), recvfrom(), sendto()
+5. Disconnect - closesocket() 
+
+Note : A DLL, or Dynamic Link Library, is a file containing code and data that can be shared and used by multiple programs simultaneously. It allows for modular programming, code 
+       reuse, and reduced memory overhead compared to static libraries. 
+
+The Server Code
+- The server must load the DLL BY INVOKING WSAStartup
+- It then creates a socket specifying the protocol to be used
+- It binds  the server's IP address to the socket
+- Then listens for clients trying to establish conncetions
+- On a client connecting the server creates a new socket to handle the client server communicatioon
+
+Step 1 : Initialising the DLL(Initalize WSA)
+- Initiates use of the Winsock DLL by a process
+	int WSAStartup( WORD wVersionRequested, LPWSADATA IpWSAData);
+ Returns 0 if it was sucessfull, the WSAStartup() function
+ wVersionRequested : The highest version of Windows SOckets specification that the caller can use. The high-order byte specifies the minor version number; the low-order byte specifies the 
+ major version number
+ A pointer to the LSPWSADATA data structure that is to receive details of the Windows Socket implementation
+ 
+ WSData Structure
+ The WSDATA structure contains information about the Windows Sockets implementation.
+ typedef stuct WSAData {
+     WOrD wVersion;
+     WORD wHighVersion;
+     char szDescription[WSADESCRIPTION_LEN+1];
+     CHAR szSystemStatus[WSASYS_STATUS_LEN+1];
+     usigned short iMaxSockets;
+     usigned short iMaxUdpDg;
+     char FAR *ipVendorinfo;
+ }
+ The WSAStartup() returns a pointer to the WSADATA structure in the IpWSAData parameters
+ Thankfully we don't have to worry about specifying all of this WSAStartups going to do it for us we just have to pass a pointer to the structure and if sucessfull it will populate all 
+ of these different attributes with the corresponding version numbers
+ eg :
+     WSADATA wsaData;
+     int wsaerr;
+     WORD mVersionRequested = MAKEWORD(2,2);
+     wsaerr = WSAStartup(mVersionRequested, &wsaData);
+     if(wsaerr){
+	    cout<<"The WInsock dll not found!"<<endl;
+     }
+     else {
+	    cout<<"The Winsock dll found!"<<endl;
+	    cout<<"The status: " << wsaData.szSystemStatus<<endl;
+     }
+     
+Step 2 : Create a socket 
+Here we specifiy the protocol to be use here we refer to the choice of either using UDP or TCP 
+
+Socket
+The socket function creates a socket that is bound to a specific transport service provider
+SOCKET WSAAPI socket(int af, int type, int protocol);
+af : The address family specification (AF_INET for UDP or TCP)
+type : The type specification for the new socket (SOCK_STREAM for TCP and SOCKDGRAM for UDP)
+protocol : THE protocol to be used (IPPROTO_TCP for TCP) 
+The socket function will return either 0 if the binding of the TCP or UDP information was successful or not and it was able to create the sockets it returns 0 like a WASStartup 
+
+Deregister Winsock2 DLL
+The WSACleanup fucntion terminates use of the Winsock 2 DLL(Ws2_32.dll)
+The return value is zero if the operation was successful
+Otherwise, the value SOCKET_ERROR is returned
+    int WSACleanup(void);
+When it has completed the use of Windows SOckets, the application or DLL must call WSACleanup to deregister itself from a Windows Sockets
+Multiple applications may share a DLL Windows tracks the number of applications using each DLL and will only remove the DLL from system memory when it is no longer required 
+eg :
+    SOCKET serverSocket = INVALID_SOCKET;
+    serverSocket = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
+    if(serverSocket == INVALID_SOCKET){
+	cout<<"Error at socket(): "<<WSAGetLastError()<<endl;
+	WSACleanup();
+	return 0;
+    }
+    else {
+	cout<<"socket() is OK!"<<endl;
+    }
+
+Close Socket
+Closes the socket passed as an argument.
+The socket must have previously been opened through a call to socket
+    int closesocket(Socket s);
+eg :
+    SOCKET serverSocket;
+    serverSocket = INVALID_SOCKET;
+    serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    closesocket(serverSocket);
+
+Step 3: Binding the socket
+Associtate a local address with a socket
+    int bind(SOCKET s, const struct sockaddr* name, int socklen);
+s: Descriptor identifying an unbound socket i.e the socket which needs to be bounded.
+name: Address to assign to the socket from the sockaddr structure.
+      sockaddr stands for socket address it is a structure that contains attributes for the ip address and the port number
+socklen: Length in bytes of the address structure.
+If no error occurs bind() returns zero otherwise it returns SOCEKT_ERROR
+
+The SOCKADDR_IN structure is used by Windows Sockets(IP4) to specify a local or remote endpoint address to which to connect a socket
+    struct sockaddr_in{
+	short sin_family;
+    	unsigned short sin_port;
+	struct in_addr sin_addr; 
+	char sin_zero[8];
+    }
+sin_family : address family(must be AF_INET)
+sin_port IP port
+sin_addr IP address
+sin_zero Padding to make structure the same size as SOCKADDR. The htons function returns the value in TCP/IP network byte order.
+eg :
+    sockaddr_in service;
+    int port = 55555;
+    service.sin_family = AF_INET;
+    InetPton(AF_INET,_T("127.0.0.1"), &service.sin_addr.s_addr);
+    service.sin_port = htons(port); //converts little endian to big endian and vice-versa
+    if(bind(serverSocket,(SOCKADDR*)&service, sizeof(service)) == SOCKET_ERROR){
+	cout<<"bind() failed "<<WSAGetLastError()<<endl;
+	closesocket(serverSocket);
+	WSACleanup();
+	return 0;
+    }
+    else{
+	cout<<"bind() is OK!"<<endl;
+    }
+
+Step 4 : Listen on the socket
+here we use newly bound socket to listen out for clients atempting to connect to that socket on the server
+listen()
+Placese a socket in a state in whcih it is listening for an incoming connection
+int listen(SOCKETs, int backlog);
+s : descriptor identifying a bound, unconnected socket.
+baclog : The max number of connections allowed(also os dependent)
+if no error occurs listen returns 0 otherwise a value of SOCKET_ERROR is returned
+eg :
+    if(listen(serverSocket,1) == SOCKET_ERROR){
+	cout<<"listen() Error listening on socekt" <<WSAGetLastError()<<endl;
+    }
+    else {
+	cout<<"listen() is OK, I'm waiting for connections.."<<endl;
+    }
+Listening process is a two part process so step 5 is continuouation of step4
+	
+Step 5: accept
+The accept fuction will actually pause the exe of the server at this point and it will wait till the client has established a connection
+with the socket that's currently being used to listen out on and then once that has been established we then accpet this connection and then move on with the exeuction
+of the server code. So this accept will actually block the progress of the server util the client has connected with it its just going to be in this state of listening so its not the
+listening funct that pauses the exe its the accept func.
+Permits an incomming connection on a socket
+This is a blocking function.
+SOCKET accept(SOCKET s, struct sockaddr* addr, int* addrlen);
+s : Descriptor that identifies a socket that has been placed in a listening state with the listen() function.
+addr : optional structure containing the client address information we used this in step three this struct
+Addrlen : Optional size of the address structure(if included).
+If no error occurs, accept() return a vlaue of typpe SOCKET that is a descriptor for the new socket that is connected to the client. The original listening socket can be used to listen for
+more incoming calls.
+This func returns another socket, remember during visualization or how socket works we created a duplicate socket so that we can maintain the first socket for listening out on but then create a dedicated
+socket for communicating with the client. So now we are gonna setup another socket variable to store what's being returned by this accept function
+eg :
+    SOCKET acceptSocket;
+    acceptSocket = accept(serverSocket, NULL, NULL);// pauses exe of server until the client connects to it and then we accept that connection
+    if(acceptSocket == INVALID_SOCKET) {
+    	cout<<"accept failed : " << WSAGetLastError() <<endl;
+	WSACleanup();
+	return -1;
+    }
+
+Client functions
+- Initalize WSA = WsAStartup()
+- Create a socket - socket()
+- Connect to the server - connect()
+- Send and receive data - recv(), send(), recvfrom(), sendto()
+- Disconnect - closesocket()	
+
+The Client Code
+The client must also load the DLL by invoking WSA Startup
+It then creates a socket
+It then connects to the server by assigning the servers IP address and port to a sockaddr structure and passing this along with the client socket to the 
+connect function
+
+First two steps are same as Server
+
+Step 3 : Connect
+Connects a client to a server (invoked from within the client)
+Within the client binding is performed  automatically.
+    int connect(SOCKET s, const struct sockaddr* addr, socklen_t addrlen);
+s : Descriptor that identifies a socket.
+addr : Structure containing server IP address  and port.
+addrlen : Size in bytes of addr structure
+Connect will wait 75 SECONDS for server to respond
+Returns 0 if successful or SOCKET_ERROR if not.
+Remember the binding is going to happen automatically so this is going to bound to the client's IP address and the port number 	
+sockaddr* and addrlen,here we are going to specify server's ip address and port number and assign and assign those to the attributes of the structure which we then pass to the connect function as the
+second parameter and length of the structure as well
+eg : // here clientsocket just reffers to a SOCKET clientsocket
+    sockaddr_in clientservice;
+    clientservice.sin_family = AF_INET;
+    InetPton(AF_INET,_T("127.0.0.1"), &clientservice.sin_addr.s_addr);
+    clientservice.sin_port = hton(port);
+    if(connect(clientsocket(SOCKADDR*)&clientservice, sizeof(clientservice))==SOCKET_ERROR){
+	cout<<"Client: connect() - Failed to connect"<<endl;
+	WSACleanup();
+	return 0;
+    }
+    else {
+	cout<<"Client connect() is OK"<<endl;
+	cout<<"Client can start sending and receiving data..."<<endl;
+    }
+This function will join accept function at the server end 
+
+Transmitting data
+1. TCP
+TCP requires a connection to be established it will only send data through socket that connects both client and a server
+
+❄Sending Data
+The send function sends data on a connected socket.
+    int send(SOCKET s, const char *buf, int len, int flags);
+s: The descriptor that identifies a connected socket. This will be the accepted socket the one which was returned from the accepted function of the server
+This func can be used at both ends and it returns a value the no of bytes sent
+buf: A pointer to the buffer to the data to be transmitted.
+len: The length, in bytes of the buffer pointed to by the buf parameter.
+flags: Optional set of flags that influences the behavior of this function(No routing etc)
+If no error occurs, send returns the number of bytes sent.
+Otherwise SOCKET_ERROR is returned
+eg: 
+    char buff[200];
+    printf("Enter your message");   
+    cin.getline(buff,200);
+    int bytcnt = send(clientSocket,buff,200,0);
+    if(bytcnt == SOCKET_ERROR){
+	printf("Server send error %ld \n",WSAGetLastError());
+        return -1;
+    }
+    else {
+	print("Bytes send %dld \n", bytcnt);
+    }
+                                  
+❄Recieve Data
+The recv Function receives data from a connect socket
+    int recv(SOCKET s, char* buf, int len, flags)
+S: The descriptor that identifies a connected socket.
+buf: A pointer to the buffer to receive the incomming data.
+len : The length, in bytes of the buffer pointed to by the buf parameter.
+flags : Optional set of flags that influences the bheavior of this func
+If no error occurs recv returns the number of bytes received.
+If the connection has been gracefully closed the return value is 0. Otherwise SOCKET_ERROR is returned
+eg :
+    char recbuff[200];
+    int bytcnt = recv(acceptSocket, recbuff, 200, 0 );
+    if(bytcnt <0) {
+	printf("Client error %ld", WSAGetLastError());
+	return 0;
+    }
+    else {
+	printf("recieved data", recbuff);
+    }
+
+❄Sending Objects 
+Sending an object. Assume that class Data has been defined elsewhere.
+Cast the object address to char*
+eg (Sending Data) :
+    Data data;
+    data.health = 100;
+    bytcnt = send(socket,(char *)&data, sizeof(Data),0);
+eg (Recieve Data) :
+    Data data;
+    bytcnt = recv(clientSocket (char *) &data, sizeof(Data), 0);
+    printf("Health: \&d\"\n",data.health);
+
+2. UDP   
+UDP stands for Universal Datagram Protocol
+Client and server don't maintain a constant connection. Don't use accpet or connect function in the server and client
+It allows the client and server to specify an IP and port number that they want to send data to and receive data from
+The advantage of this is that it reduces the lag associated with establishing a connection
+Either can transmit a packet.
+The receiving application can determine who sent the packet and respond if necessary.
+There is however no guarantee that the packet will reach its destination
+Reduces the lag associated with TCP
+Used in Multiplayer games when transmitted data is not critical
+                        
+UDP Setup
+Initialse the library as with TCP
+Create a socket configured for UDP
+For a server only bind the socket to an address
+Invoke **sendto** to transmit data
+Invoke **recvfrom** to reveive data
+
+UDP Socket
+Invoke the socket function as with a TCP socket
+SOCKET WSAAPI socket(int af, int type, int protocol);
+eg : SOCKET socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+The address family specification is AF_INET as with TCP
+The type specification for UDP is SOCK_DGRAM
+The protocol to be used IPPROTO_UDP
+Note : On server side we will not listen out on socket that is step 4 and step 3 of client are to be skipped
+       Neither will be step 5 of server will be used as we don't accept the connection
+Note : There is no notion of a fixed connection between client and server and hence the server doesn't utilise the accept function nor the
+noe the client the connect function
+
+Sending Data
+The sendto function sends data to a specific destination.
+int sendto(SOCKET s, const char *buf, int len, int flags, const struct sockaddr *to, int tolen);
+s : A descriptor identifying a(possibly connected) socket. A scoket bound to IP address of server
+buf : A pointer to the data to be transmitted.
+len : Size in bytes of the data pointed to by the buf parameter.
+flags : Flags that specify the way in which the call is made.
+to : An optional pointer to a sockaddr_in structure that contains the address of the target socket.
+tolen : The size, in bytes, of the address pointed to by the to parameter
+IF no error occurs, sendto returns the total numbers of bytes send else -1.
+eg :
+   sockaddr_in address;
+   address.sin_family = AF_INET;
+   inetPton(AF_INET, _T("127.0.0"), &address.sin_addr.s_addr);
+   address.sin_port = htons(5555);
+   char buf[2222] = "Send this to server";
+   int bytsnt = sendto(socket, (const char*)buffer, strlen(buffer), 0, (struct sockaddr *)&address, sizeof(address));
+   if(bytsnt == -1){
+	cout <<"Error transmitting data" <<endl;
+	WSACleanup();
+	return 0;
+   }
+   else {
+	cout << "Data sendt : " << buff << endl ;
+   }
+
+Receiving Data
+The recvfrom function feceives a datagram and stores the source address. This is a blocking function.
+int recvfrom(SOCKET s, char *buf, int len, int flags, struct sockaddr *from, int *fromlen);
+S : A descriptor identifying a bound socket.
+buf : A buffer for the incoming data.
+len : Size in bytes, of the buffer pointed to by the buf parameter.
+flags : flags that modify the behavior of the function
+from : AN optional pointer to a buffer in a sockaddr_in structure that will hold the source address upon return.
+fromlen : The size in bytes of the address pointed to by the from parameter.
+If no error occurs , recvfrom returns the number of bytes received else -1.
+eg : 
+   char buff[200];
+   sockaddr_in clientadd;
+   int clientadd_length = (int)sizeof(clientAddress);
+   int bytrec = recvfrom(socket,buff,200,0,(struct sockaddr *) &clientAddress, &clientAdd_length);
+   if(bytrec <0) {
+	cout<<"Could not receive datagram"<<endl;
+   }
+
+
+Lets look at how we can send complex types, specifically look at how we can send objects of classes through the UDP
+
+Vector3D :
+A class representing a 3D vector with x, y and z members variables
+x,y and z are public and can therefore be manipulated directly
+eg :
+   class vect3d {
+   public:
+	float x,y,z;
+	vect3d(float x1, float, y1, float z1) : x=x1,y=y1,z=z1P{};
+   };
+   vec3d point(0.0,0.0,0.0);
+Lets say we want to send object of this class through UDP send to function so what we will do is convert to char array
+Primitve data types should be converted to char array before being transmitted  
+The sprintf() performs this task.
+    sprintf(char *buffer, const char* format, list of args);
+
+eg : 
+vect3d pos(1.0,2.0,3.0);
+char posbuff[200] = sprintf(posbuff, "%6.1f%6.1f%6.1f", pos.x,pos.y,pos.z);
+
+The % character in the format string is a placeholder
+6.1 indicates the  size and decimal places and the f that a float will be passed to it
+
+
+struct addrinfo: It’s a structure that stores information about one or more socket addresses
+struct addrinfo {
+    int              ai_flags;      // Options (e.g., AI_PASSIVE)
+    int              ai_family;     // AF_INET (IPv4), AF_INET6 (IPv6), or AF_UNSPEC
+    int              ai_socktype;   // SOCK_STREAM, SOCK_DGRAM, etc.
+    int              ai_protocol;   // 0 for any, or IPPROTO_TCP/IPPROTO_UDP
+    socklen_t        ai_addrlen;    // Length of ai_addr
+    struct sockaddr *ai_addr;       // Pointer to address (IP + port)
+    char            *ai_canonname;  // Canonical name of the host
+    struct addrinfo *ai_next;       // Pointer to next in list (linked list)
+};
+You’ll load this struct up a bit, and then call getaddrinfo(). It’ll return a pointer to a new linked list of
+these structures filled out with all the goodies you need
+more about addrinfo --> https://chatgpt.com/c/682416da-6898-8002-83de-98270b5154f9
+https://chatgpt.com/c/682416da-6898-8002-83de-98270b5154f9 -->about a project i have thought about

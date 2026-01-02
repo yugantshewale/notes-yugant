@@ -1,0 +1,612 @@
+*#*#* These notes are taken from - https://www.youtube.com/watch?v=cnzka7kF5Zk  *#*#*
+Schema :
+schema defines the structure of a database, outlining how data is organized, including tables, fields, data types, and relationships between them
+It acts as a blueprint, dictating how data is stored and accessed.
+
+Operations in database -
+1) Listing down existing databases :
+SELECT datmane FROM pg_database;
+OR \l works for linux
+
+2) Creating a new database :
+CREATE DATABASE <db_name>; eg : CREATE DATABASE test;
+
+3) Change a Database :
+\c <db_name>;
+
+4) Deleting a Database
+DROP DATABASE <db_name>; eg : DROP DATABASE test; 
+___________________________________________________________________________________________________________________________
+CRUD(Create, Read, Update, Delete) operations in database - 
+These are most basic operations you can do with data
+
+Table : A table is a collection of related data held in a table format within database
+
+Creating a table :
+CREATE TABLE <table_name> (
+	id <data_type>(size{here size reffer to the max length or range of data per cell),
+	column1 <data_type>,
+	   .
+	   .
+	columnn <data_type>
+);
+eg :
+CREATE TABLE person (
+	id INT,
+	name VARCHAR(100),
+	city VARCHAR(100)
+);
+
+Adding data into a Table using INSERT qquery :
+Inserting values into table:
+INSERT INTO <table_name>([Columns that you want to insert data into]) VALUES ([Data for the relative values]);
+eg : INSERT INTO person(id, name, city) VALUES (101, 'Yugant', 'Pune');
+NOTE : If you want to add multiple data just write it after the first data
+eg : INSERT INTO person(id, name, city) VALUES (101, 'Yugant', 'Pune'),(102, 'Alex', 'London'), (106, 'Chotelal', 'Patna');
+NOTE2 : You can drop the column names IF YOU ARE INSERTING VALUES FOR ALL COLUMNS IN DATABASE
+	for example in above eg we are inserting values for all columns of table person so we can drop (id, name, city) part
+	i.e  INSERT INTO person VALUES (101, 'Yugant', 'Pune');
+eg2 : INSERT INTO person(id, name) VALUES (101, 'Yugant'); // this inserts ony two values third value is set to null
+
+Reading data from a table 
+SELECT * FROM <table_name> 
+OR SELECT <column_name> from <table_name>
+eg : SELECT * FROM person; (shows all columns from table person)
+eg2 : SELECT name FROM person; (shown name column from table person)
+eg3 : SELECT name,city FROM person; (shown name and city columns from table person)
+
+Updating data from a talbe
+Modify/Update data from a table
+
+UPDATE <table_name>
+	SET column_name = value // the value you want to change
+	WHERE row_name = value; // the row in which the value need to be changed
+eg : 
+UPDATE person
+	SET city = 'London'
+	WHERE id = 2;
+So the city of id 2 will change to London
+
+Deleting data from a table
+DELETE FROM <table_name>
+	WHERE <column_name> = value; // This deletes the row where the value is present
+eg : DELETE FROM person
+     WHERE id = 4; //deletes row where id = 4
+______________________________________________________________________________________________________________________
+Datatypes in databases :
+Numeric - INT, DOUBLE, FLOAT, DECIMAL
+String - VARCHAR
+DATE - DATE
+BOOLEAN - BOOLEAN
+NOTE : For more see on google :)
+**********************************************
+Constraint - It is a rule applied to a column
+There are different types of constraints 
+1> Primary key constraint
+The primary key constraints uniquely identifies each record in a table
+PRIMARY key must contain UNIQUE values and cannot contain NULL values
+A table can have only ONE primary key
+CREATE TABLE <table_name>(
+	col_name data_type PRIMARY KEY; // this tells no null values and duplicate allowed in this column
+	   .
+           .
+);
+
+2> NOT NULL constraint
+CREATE TABLE <table_name>(
+	col_name data_type NOT NULL; // this tells no null values allowed in this column
+	   .
+           .
+);
+
+eg : CREATE TABLE customer(
+	id INT NOT NULL,
+	name VARCHAR(100) NOT NULL
+);
+
+3> DEFAULT value constraint
+CREATE TABLE <table_name>(
+	col_name data_type NOT NULL DEFAULT DEFAULT_VALUE; // this tells no null values allowed in this column if no value entered use default
+	   .
+           .
+);
+
+eg : CREATE TABLE account (
+	acc_no INT PRIMARY KEY,
+	name VARCHAR(100) NOT NULL,
+	acc_type VARCHAR(100) NOT NULL DEFAULT 'Savings'
+);
+
+4> AUTO_INCREMENT
+increments automatically uses SERIAL data_type starts with 1
+eg : CREATE TABLE Employees(
+	id SERIAL PRIMARY KEY,
+	first_name VARCHAR(100) NOT NULL,
+	last_name VARCHAR(100) NOT NULL
+);
+
+5> UNIQUE
+same function a primary key but allows null values 
+_________________________________________________________________________________________________________________________________
+Clauses
+Where, Distinct, Order By, Limit, Like
+Clauses are used for data refining process
+When you are executing some sql query and you give some condition with it, it is called caluse.
+
+1> Where - Used to update, delete. Used to fetch specific data
+eg : SELECT * FROM person WHERE city = 'Pune'; //recommended to use primary key instead for finding specific person or if you want to find rows
+					       // with specific common point eg here this query can give mulitple rows of person who live in pune
+we can also use relational operator in here
+eg : SELECT * FROM employee WHERE salary >= 50000; // gives all rows with salary data >= 50000
+################################################################################################################################
+Relational operators
+We can also use logical operators here
+eg : SELECT * FROM employee WHERE salary >= 50000 or salary <= 10000; // Gives all rows where salary is >=50000 or salary <= 10000
+eg2 : SELECT * FROM employee WHERE salary >= 50000 and dept = 'HR'; // gives all rows where dept = 'hr' and salary >= '50000'
+
+Different realtional operators
+< -> less than
+> -> greater than
+= -> equals to
+<= -> less than or equals to
+>= ->greater than or equals to
+!= -> not equals to
+
+IN, NOT IN operators :
+Suppose I want all rows where dept is either IT, HR, Finance
+the query will look like - SELECT * FROM WHERE dept = 'HR' or dept = 'IT' or dept = 'Finance';
+this looks messy instead we can used IN operator which looks cleaner the above query with in operator will look like-
+SELECT * FROM WHERE dept IN('IT','Finance', 'HR)';
+NOT IN just negation of above just add NOT before IN
+
+BETWEEN operator:
+Suppose I want all rows between some range we use between, say I want salary between range of 10000 to 50000 we use BETWEEN
+this query without BETWEEN looks like - SELECT * FROM WHERE salary >= 10000 and salary <= 50000;
+the above query using BETWEEN operator looks like - SELECT * FROM WHERE salary BETWEEN 10000 and 50000;
+NOTE : BETWEEN is inclusive
+##############################################################################################
+2> Distinct
+Gives unique values from column
+syntax - SELECT DISTINCT f_name FROM table_name;
+Suppose I do SELECT city FROM person;
+this will give me city column there might be rows with same citys but I want only unique values of that columns
+this query can give me : pune, mumbai ,kolkata , london, london, london, pune
+but I want only unique values therfore I will use DISTINCT clause 
+eg : SELECT DISTINCT city FROM person;
+this query will return all unique values that is pune, mumbai, kolkata, london
+
+3> Order By
+Used to sort data in alphabetical order or numberical order of table acc to some specific column
+eg : SELECT * FROM employees ORDER BY first_name; // sorts data acc to first name in alphabetical order
+If you want to sort data in descending order use DESC
+eg : SELECT * FROM employees ORDER BY first_name DESC;
+eg : SELECT Name   //This gets students with marks 75 > and sorts them based on their last three characters
+     FROM STUDENTS // RIGHT first extracts last three character and Sorts first by last 3 characters of name
+     WHERE Marks > 75 // If those are same for two names, sorts by ID (ascending) as a tie-breaker.
+     ORDER BY RIGHT(Name, 3), ID;
+
+
+4> LIMIt
+Used to show limited data
+eg : SELECT * FROM employees LIMIT 3; // will show three rows of data only
+
+5> LIKE
+If we wanted to find data of specific value we used WHERE but suppose we want to find data which begins with specific value or some other pattern
+we use LIKE
+eg cum syntax: SELECT * FROM employees WHERE dept LIKE "%acc%"; 
+
+eg : SELECT * FROM employees WHERE first_name LIKE 'A%'; // gives all rows where first_name starts with A the % sign suggest that we don't care
+							 // whatever comes after its just that begining should be A
+eg2 : SELECT * FROM employees WHERE first_name LIKE '%a'; // gives all rows where first_name ends with a the % sign suggest that we don't care
+							 // whatever comes before its just that end should be a
+in the above eg where we used "%acc%" this tells that we don't care what comes before or in end the middle part should contain acc
+
+Patterns for LIKE
+Starts with 'A'			 : LIKE 'A%'
+Ends with 'A' 			 : LIKE '%A'
+Contains 'A'  			 : LIKE '%A%'
+Secnd character should be A      : LIKE '_A%'
+Case-insensitive contains 'john' : ILIKE '%john%'
+
+Another patter for like
+suppose I want all rows where a certian columns contains only two letters in there data
+for example I want all rows of employees where the dept data contains only two letters i.e HR and IT rows should be output
+eg : SELECT * FROM employees WHERE dept LIKE '__';//outputs all rows where dept is made of two characters
+_________________________________________________________________________________________________________________________________
+Aggregate functions
+These are some functions for caclulations.
+Suppose if I want to find out total.no of employees
+Employee with Max salary
+or Average salary of employee we can use this functions
+Aggregate function - COUNT(), SUM(), AVG(), MIN(), MAX()
+
+1> COUNT()
+eg : SELECT COUNT() from employees; // gives total numbers or rows of the table there may be other ways to use it lets see them
+eg2 : SELECT COUNT(first_name) from employees; // gives total number of data present in the column first_name
+
+2> SUM()
+eg : SELECT SUM(salary) from employees;// gives total sum of column salary from employees
+
+3> AVG()
+eg : SELECT AVG(salary) from employees;// gives total average of column salary from employees
+
+4> MIN()
+eg : SELECT MIN(salary) from employees;// gives min of column salary from employees
+
+5> MAX()
+eg : SELECT MAX(salary) from employees;// gives max of column salary from employees
+_________________________________________________________________________________________________________________________________
+Group by
+Suppose I want to find total number of employees in each dept how will i do it(this is just one usecase)
+or suppose grouping based on gender
+syntax SELECT col_name FROM table_name GROUP BY col_name;
+syntax cum eg- SELECT dept FROM employees GROUP BY dept;//this step groups the dept col together i.e groups hr emp toether, it emp together and so on
+step 2 : SELECT dept, COUNT(emp_id)FROM employees GROUP BY dept; // this step gives count of each group
+
+eg2 : SELECT dept FROM employees GROUP BY dept;
+step 2 : SELECT dept, COUNT(salary) FROM employees GROUP BY dept; // sums of total salary acc to dept
+_________________________________________________________________________________________________________________________________
+String functions
+used to decorate data during printing or manuplate values of column
+
+String Fuctions
+CONCAT(), CONCAT_WS(), SUBSTR(), LEFT(), RIGHT()
+LENGTH(), UPPER(), LOWER(), TRIM(), LTRIM(), RTRIM()
+REPLACE(), POSITION(), STRING_AGG()
+
+CONCAT()
+syntax : CONCAT(first_col,second_col);
+syntax2 : CONCAT(first_col, second_col, ....)
+eg : SELECT CONCAT('HELLO', 'WORLD'); // print HELLOWORLD
+eg2 : SELECT CONCAT(first_name, last_name) FROM employees; // concats firstname and last name columns into single column during printing although
+							   // i don't know if it does same to table data or it just does it during printing
+
+CONCAT_WS()
+this is called concat with seperator in above eg2 when we did CONCAT(first_name, last_name) it combined them into a single word print the name
+continuous to print first name and last name together without being continuous we can do CONCAT(first_name, ' ', last_name) but it doesn't look good
+so we use CONCAT_WS() which is read as concat with seperator CONCAT(first_name, ' ', last_name) is equivalent to 
+CONCAT_WS(' ', first_name, last_name); if we wanted to add more values seperated by certain character this fuction is more convinient to use as you
+don't have to manually add seperator between them
+
+SUBSTR()
+syntax : SUBSTR(string, start_idx, end_idx)
+eg : SUBSTR("HEY BUDDY",1,4); // here indexing is from 1 and end_idx is not included that is [start_idx, end_idx)
+
+REPLACE()
+syntax : REPLACE(str, from_string, to_string)
+eg : REPLACE("Hello buddy","Hello", "Hey");
+eg2 : SELECT REPLACE(dept, "IT","TECH") FROM employees; // will replace IT with TECH in colum dept of table employees
+
+REVERSE()
+eg : SELECT REVERSE('HELLO WORLD');
+eg2 : SELECT REVERSE(first_name) FROM employees; // print names in reverse (that is raj will be printed as jar) of column first_name of table employe
+
+LENGTH()
+eg : SELECT LENGTH('hello'); // prints 5
+eg2 : SELECT LENGTH(first_name) FROM employees; // prints length of each name from column first_name of table employee
+eg3 : SELECT * FROM employees WHERE LENGTH(first_name) > 5; // prints all rows where first_name length is greater than 5
+
+UPPER() and LOWER()
+egn : SELECT UPPER(first_name) FROM employees; // prints name in upper case
+same case for lower 
+
+LEFT() and RIGHT()
+LEFT() total number of characters from left i.e [1,total_char] and RIGHT() for total number of character from right i.e [length_str, total_char]
+eg : SELECT LEFT("HELLO",4);  //prints HELL
+eg2 : SLECT RIGHT("HELLO",4); // prints ELLO
+
+TRIM()
+eg : TRIM(' ALRIGHT '); // removes all space after and before ALRIGHT
+eg TRIM('          ALRIGHT                  '); // removes all space after ALRIGHT and before ALRIGHT
+
+POSITION()
+gives postition of the string
+syntax : POSITION(str_to_find in str); // gives starting index of the string in 1 based indexing format
+eg : POSITION("HELL" in "HELLO"); // prints 1
+****MUST DO - Do exercise at 2:18 because there are some imp examples and also explains sub-queries****
+____________________________________________________________________________________________________________________________________________
+Alter tables
+All about modification of table
+
+To add columns 
+syntax : ALTER TABLE table_name ADD COLUMN column_name data_type(size); 
+eg : ALTER TABLE contacts ADD COLUMN City VARCHAR(50); // add city column to table contacts
+eg 2: ALTER TABLE person ADD COLUMN age INT;
+
+To remove columns 
+syntax : ALTER TABLE <table_name> DROP COLUMN <column_name>;
+egg : ALTER TABLE person DROP COLUMN age; 
+
+Set newly created column to default value
+syntax : ALTER TABLE <table_name> ADD COLUMN <column_name> <data_type>DEFAULT value;
+eg : ALTER TABLE person ADD COLUMN age INT DEFAULT 0;
+
+Rename a column name
+syntax : ALTER TABLE <table_name> RENAME COLUMN <column_name> TO <NEW_NAME>;
+eg : ALTER TABLE contacts RENAME COLUMN name TO full_name;
+eg2 : ALTER TABLE person RENAME COLUMN name TO full_name;// changes name column's name to full_name
+
+Rename a table name
+syntax : ALTER NAME <table_name> RENAME TO  <new_table_name>;
+OR
+syntax : RENAME TABLE <table_name> TO <new_table_name>;
+eg : RENAME TABLE person TO person_db;
+
+modifying a column
+Suppose the column first_name in person is of type and size VARCHAR(100) but  you want to increase size of it we can do it
+eg : ALTER TABLE person ALTER COLUMN first_name SET DATA TYPE VARCHAR(200);
+eg2 : ALTER TABLE person ALTER COLUMN first_name SET DEFAULT 'Unknown';
+eg3 : ALTER TABLE person ALTER COLUMN first_name SET NOT NULL;
+eg4 : ALTER TABLE person ALTER COLUMN first_name DROP DEFAULT;
+eg5 : ALTER TABLE contacts ALTER COLUMN DROP CONSTRAINT person_mob_check;//name of constraint appears once you make a error
+									//by yourself also this is for eg below and ALTER too
+eg6 : ALTER TABLE contacts ALTER COLUMN ADD CONSTRAINT mob_not_null CHECK(mob != NULL);
+____________________________________________________________________________________________________________________
+Check Constraints
+Suppose we are storing contact numbers in our db ther we can add constraints such that length is >= 10
+eg : CREATE TABLE contacts(name VARCHAR(50), mob VARCHAR(15) UNIQUE CHECK(LENGTH(MOB)>=10));//this checks if num >= 10
+
+Named Constraints
+we are just giving name to constraints so that when we remove it we dont remove all just the one we want to remove 
+eg :CREATE TABLE contacts(name VARCHAR(50), mob VARCHAR(15) UNIQUE, CONSTRAINT Mob_did_less_than_10 CHECK(LENGTH(MOB)>=10));
+____________________________________________________________________________________________________________________
+Case Expression
+Suppose I want to add another column in employee table called salary category which tells if employees salary is low or high
+or suppose there exist a student database and you want to categorize them based on pass/fail based on their marks you will
+also require case expression in that situation, think of it as an if-else condition
+eg : (suppose I want to add high salary and low salary )
+select first_name, salary,
+    CASE
+	WHEN salary >= 50000 THEN 'HIGH SALARY'
+	ELSE 'LOW SALARY'
+END AS salary_category // salary_category is name of our column where we will store result
+FROM
+    employees;
+
+eg2 : select first_name, salary,
+    CASE
+	WHEN salary >= 50000 THEN 'HIGH SALARY'
+	WHEN salary >= 40000 AND salary <= 50000
+	    THEN 'MEDIUM SALARY'
+	ELSE 'LOW SALARY'
+END AS salary_category 
+FROM
+    employees;
+____________________________________________________________________________________________________________________
+Relationship and its type
+Relationship is relation between different tables of same db
+suppose there is database called employess and it will contain many tables such as Salary, Attendance, employees, requests,
+offices, task and there could be many tables. It becomes easier to managedata if its distributed as it becomes more efficient
+too.
+
+There are 3 types of relating ship
+1) One - to - One
+2) One - to - Many
+3) Many - to - Many
+
+1) One - to - One
+Suppose we have two tables one Employees details and Employes contacts. Suppose there is employee Raju in Employee details
+then his personal details such as address, contacts are going to be one so his details are going to appear only once in the 
+Employees contacts table.
+
+2) One - to - Many
+Suppose now we have one moretable  employee task and Raju from Employee details can have multiple tasks he be doing so there
+will be multiple entries in emplyee task table in name of raju for task.
+
+3) Many - to - Many 
+Supoose there is a book with multiple writers but also the writes can have multiple books the have published
+#######################################################################################################################
+Foregin Key
+If we are using one tables primary key in other table it is called foregin key in that table where it is being used
+eg :
+Customer table :-
+    CREATE TABLE customers (
+	cust_id SERIAL PRIMARY KEY;
+	cust_name VARCHAR(100) NOT NULL
+    );
+
+Order table :-
+    CREATE TABLE order (
+	ordr_id SERIAL PRIMARY KEY,
+	ordr_date DATE NOT NULL,
+	price NUMERIC NOT NULL,
+	cust_id INTEGER NOT NULL
+	FOREGIN KEY(cust_id) REFRENCES customers(cust_id)
+);
+#######################################################################################################################
+Join
+Join operator is used to combine rows from two or more tables based on a related column between them
+
+Types of join
+1) Cross Join
+2) Inner Join
+3) Left Join
+4) Right Join
+
+1) Cross Join
+Every row from one table is combined with every row from another table
+eg : SELECT * FROM customer CROSS JOIN orders;
+// This gives a table by cross joining every row of first table with another table 
+//Think of it as all possible combination of one row from first table with all rows of the another table execpt we do it
+// for all rows of first table and then put them into single table and output it
+
+2) Inner Join
+Returns only the rows where there is a match between the specified columns in both the left(or first) and right(or second)
+tables
+eg : SELECT * FROM customer c INNER JOIN orders o ON c.cust_id = o.cust_id;
+ // here c and o are alias(dusra navv)
+//c.cust_id = o.cust_id customer's and orders cust_id are connected to each other 
+// inner join shows intersection between two tables 
+eg2 : SELECT c.cust_name, COUNT(o.order_id) FROM customer c INNER JOIN orders o ON c.cust_id = o.cust_id GROUP BY cust_name;
+eg3 : SELECT c.cust_name, SUM(o.price)FROM customer c INNER JOIN orders o ON c.cust_id = o.cust_id GROUP BY cust_name;
+
+3) Left JOIN
+Returns all rows from the left(or first) table and the matching rows from the right(or second table)
+eg : SELECT * FROM customer c LEFT JOIN orders o ON c.cust_id = o.cust_id
+
+4) Right Join
+Right join is simply opposite of left join
+#######################################################################################################################
+Many to Many eg :
+One student can take multiple courses and one course can have multiple students this is an eg of MTM relationship.
+The Tables and their respective columns for this eg will be
+students - id, student_name
+coures - id, course_name, fees
+student_course - student_id,course_id
+_______________________________________________________________________________________________________________________
+Views
+Views is a temp table which can be accessed with simple click
+syntax : Step1 - CREATE VIEW <temp_table_name> AS; // add this as first line before a query
+	 Step2 - type the query
+	 Step3 - SELECT * FROM <temp_table_name>;
+//so you dont have to type the whole query again to see the same result its way quicker and time saving
+_______________________________________________________________________________________________________________________
+HAVING Clause
+When we use GROUP BY we get column of  all products and how many of them are sold from (MTM eg) but what if I want to know 
+only about specific product?
+eg : SELECT prod_name, SUM(total_price) from billin_info GROUP BY p_name HAVING sUM(total_price) > 500;
+_______________________________________________________________________________________________________________________
+Group by ROLLUP
+Suppose I want a total at the end that is after group by if I want total price of total products bought at the end I will use
+rollup, suppose, say rohan but some products 2 pens for 10$ 5 apples for 25$ and I want total amt he spend then I will use it
+eg : SELECT COALESCE(p_name, 'TOTAL'), SUM(total_price) from billin_info GROUP BY ROLLUP(P_name) ORDER BY SUM;
+//COALESCE where there is null fill it with given argument here it will fill 'TOTAL' wherever there is null in column p_name
+_______________________________________________________________________________________________________________________
+Stored Routine
+AN SQL statement or a set of SQL statement that can be stored on database server which can be call no of times
+Tyes of Stored Routines
+!) STORED Procedure
+2)User defined function
+
+!) STORED Procedure
+Set of SQL statements and procedural logic than can perform operations such as insertin, updating and querying data
+syntax : CREATE OR REPLACE PROCEDURE procedure_name (parameter_name, parameter_type,..)
+	 LANGUAGE plpgsql
+	 AS $$
+	 BEGIN 
+ 		 -- procedural code here	
+	 END;
+	 $$;
+
+eg :
+CREATE OR REPLACE PROCEDURE update_emp_sal (
+    P_employee_id INT,
+    P_new_salary NUMERIC
+) 
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN
+	UPDATE employees
+	SET salary = P_new_salary
+	WHERE emp_id = p_emplopyee_id;
+    END;
+    $$
+how to call this function : update_emp_sal(3, 400000);
+
+2) User defined 
+Custom function created by user to perform specific operations and retur value
+syntax : CREATE OR REPLACE FUCTION func_name ([parameters])
+	 RETURNS retunr_type AS $$
+	 BEGIN 
+ 		 -- fuction body code (sql statements)here
+		 RETURN some_value;	
+	 END;
+	 $$; LANGUAGE plpgsql
+eg : 
+CREATE OR REPLACE FUNCTION dept_max_sal_emp1(dept_name VARCHAR)
+RETURNS TABLE(emp_id INT, fname VARCHAR, salary NUMERIC)
+    AS $$
+    BEGIN
+	RETURN QUERY
+	SELECT
+	    e.emp_id,e.fname,e.salary
+	FROM
+	    employees e
+	WHERE
+	    e.dept = dept_name
+	    AND e.salary = (
+	        SELECT MAX(emp.salary)
+		FROM employees emp
+		WHERE emp.dept = dept_name
+	    );
+	    END;
+    $$ LANGUAGE plpgsql
+
+How to call : SELECT * FROM dept_max_sal_emp1('HR');
+______________________________________________________________________________________________________________
+Windows function
+Windows functions, also know as analytic functions allow you to perform calculations across a set of rows related to 
+the current row across a set of rows related to current row.
+Defined by an OVER() caluse.
+If I do 
+SELECT SUM(salary) FROM employees;
+it is going to give me one result but what if I want that sum for all rows
+To do that we can use
+SELECT fname, salary, SUM(salary) OVER() FROM employees;
+See windows func section
+______________________________________________________________________________________________________________	
+CTE(Common Table Expression)
+CTE is a temporary result set that you can define within a query to simplify complex SQL statements
+Syntax WITH cte_name (optional_column_list) AS (
+    -- CTE query definition
+    SELECT ...
+)
+-- Main query referencing the CTE
+SELECT ..
+FROM cte_name
+WHERE ...;
+
+Use cases - 1
+we want to cal the av salary per dept and then find all employees whose sal is above the avg salary of their dept
+eg :
+WITH avg_salAS (
+select dept, AVG(salary) as avg_sal from employees GROUP BY dept
+)
+SELECT 
+    e.emp_id, e.fname, e.dept, e.salary
+FROM employees e 
+JOIN
+    avg_sal a ON e.dept=a.dept
+WHERE e.salary >a.avg_salary;
+
+Use Cases-2
+we want to find the highest paid employee in eah dept
+______________________________________________________________________________________________________________	
+Triggers
+Specified procedures in DB that automatically exe predefined action in response to certain events on a specfied table or view
+syntax :
+CREATE TRIGGER trigger_name { BEFORE | AFTER| INSTEAD OF } {INSERT | UPDATE | DELETE | TRUNCATE}
+ON table_name
+FOR EACH {ROW | STATEMENT}
+EXECUTE FUNCTION triger_function_name();
+eg : 
+CREATE OR REPLACE FUNCTION trigg_func()
+RETURNS TRIGGER AS $$
+BEGIN
+ --Tigger logic here
+ RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+Usecase 
+Create a trigger so that if we insert/update negative salary in a table it will be triggered and set to 0.
+
+eg : - -we need to create fucntion for triggers
+CREATE OR REPLACE FUNCTION check_sap
+RETURNS TRIGGER AS $$
+BEGIN 
+    IF NEW.salary < 0 THEN
+    NEW.salary = 0;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql
+
+-- creating a trigger
+CREATE TRIGGER before_update_sal
+BEFORE UPDATE ON employees
+FOR EACH ROW
+EXECUTE FUNCTION check_salary();
+______________________________________________________________________________________________________________	
+**************************************************************************************************************
+                                                     END 

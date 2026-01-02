@@ -1,0 +1,5 @@
+var inpt;
+do {
+    inpt = getInput();
+    console.log("hello")
+} while (!isValid(input));

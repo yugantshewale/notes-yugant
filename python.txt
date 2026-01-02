@@ -1,0 +1,735 @@
+***BASIC DATA STRUCTURES***
+
+1. String methods: "" 🖤
+capitalize, casefold, center, count, encode, endswith, expandtabs, find, format, index, isalnum, isalpha, isascii, isdecimal, isdigit, 
+isidentifier, islower, isnumeric, isprintable, isspace, istitle, isupper, join, ljust, lower, lstrip, maketrans, partition, removeprefix, 
+removesuffix, replace, rfind, rindex, rjust, rpartition, rsplit, rstrip, split, splitlines, startswith, strip, swapcase, title, translate, 
+upper, zfill. 
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+2. List methods: [] 🖤
+You can create a list by placing a comma-separated sequence of items inside square brackets [] or by using the built-in list() constructor.
+eg  : numbers = [1, 2, 3, 4, 5]
+eg2 : range_list = list(range(1, 6))
+eg3 : squares = [x**2 for x in range(1, 6)] #This is called List Comprehension
+eg4 : my_tuple = (1, 2, 3, 4)
+      numbers_list = list(my_tuple)
+eg5 : repeated_list = [0] * 5 
+-append, clear, copy, count, extend, index, insert, pop, remove, reverse, sort.
+
+List with type hint
+eg : people: list[str] = ["Yugant", "Om", "Yash"]
+     print(people[0])
+
+Note : + remove will remove first occurence of value if you want to delete as a index and not a value use del li[index] and not li.remove(value)
+       + li.insert(index, value)
+ (IMP) + Use .extend instead of .append() extend will increase the size of list by adding its elements to the list and append will add the list as an
+         ELEMENT to the list.
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+3. Tuple methods: () 🖤
+Tuples in Python are similar to lists, but they are immutable, meaning their elements cannot be changed after creation. You can create a 
+tuple using parentheses () or by simply separating items with commas. You can use the built-in tuple() function to convert any other iterable
+object (like a list, string, or range) into a tuple.
+eg  : empty_tuple = ()
+eg2 : numbers = (1, 2, 3, 4, 5)
+eg3 : my_list = [1, 2, 3]
+      list_to_tuple = tuple(my_list)
+eg4 : my_string = "world"
+      string_to_tuple = tuple(my_string)
+
+Without Parentheses (Tuple Packing)
+Python allows you to omit the parentheses if the context makes it clear you are defining a sequence. This is often called "tuple packing." 
+eg : coordinates = 10, 20      # creates the tuple (10, 20)
+     person = "John", 30, "USA" # creates the tuple ('John', 30, 'USA')
+
+Special Case: Single-Item Tuple
+To create a tuple containing only a single item, you must include a trailing comma after the element. Without the comma, Python treats the 
+syntax as a simple value in parentheses (an integer, a string, etc.). 
+
+single_tuple = (42,) # A single-item tuple (correct way)✅
+not_a_tuple = (42) # A simple integer wrapped in parentheses (incorrect way for a tuple)❎
+
+-count, index .
+
+Note : + Tuples are immutable but can be extended
+         eg : tup = (1,2,3,4)
+              tup[1] = 7 ❎
+              tup + (0,7,5) ✅
+       + Some more about tuple unpacking
+         eg : a, *b, c = (1, 2, 3, 4)  # a is now 1, b is now [2, 3] and c is now 4
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+4. Set methods: {} 🖤
+In Python, a set is an unordered collection of unique items. Sets are defined using curly braces {} or the set() constructor.
+eg  : numbers = {1, 2, 2, 3, 4}
+eg2 : empty_set = set()
+eg3 : my_list = [1, 2, 2, 3, 4, 4, 5]
+      unique_numbers = set(my_list)
+eg4 : squares = {x * x for x in range(5)} #This is called Set Comprehension
+
+-add, clear, copy, difference, discard, intersection, isdisjoint, issubset, issuperset, pop, remove, union, update.
+
+Note : + Similar to keys of a dictionary, elements of a set have to be immutable.
+         eg : invalid_set = {[1], 1} ❎ # => Raises a TypeError: unhashable type: 'list'
+	      valid_set = {(1,), 1}  ✅
+       + Do various operations on set
+         1. Intersections                      : Set1 & Set2
+         2. Union    		               : Set1 | Set2
+         3. Difference   		       : Set1 - Set2
+         4. Symmetic diff 		       : Set1 ^ Set2
+	 5. Check if left is superset of right : Set1 >= Set2
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+5. Dictionary : {key:value} 🖤
+A dictionary is an unordered collection used to store data values in key-value pairs. Each key must be unique and is used to retrieve its 
+associated value. Dictionaries are created using curly braces {} with colons to separate keys and values, or by using the dict() constructor
+eg  : empty_dict = {}
+eg2 : person = {"name": "Alice", "age": 25, "city": "New York"}
+eg3 : data = {1: "One", "fruits": ["apple", "banana"], (1, 2): "coordinates" }
+eg4 : person_dict = dict(name="Bob", age=30, city="Chicago") # Using dict constructor
+eg5 : squares_dict = {x: x * x for x in range(5)} # squares_dict will be {0: 0, 1: 1, 2: 4, 3: 9, 4: 16}
+
+-From a list of tuples to Dictionary
+eg : items_list = [("apple", 1), ("banana", 2), ("cherry", 3)]
+     fruit_counts = dict(items_list)
+
+-clear, copy, fromkeys, get, items, keys, pop, popitem, setdefault(key, value)#creates key if not present else updates it, update, values.
+
+Note : + Note keys for dictionaries have to be immutable types. This is to ensure that the key can be converted to a constant hash value for 
+         quick look-ups. Immutable types include 🛑ints, floats, strings, tuples🛑.
+         eg : invalid_dict = {[1,2,3]: "123"} ❎
+              valid_dict = {(1,2,3):[1,2,3]}
+       + Check for existence of keys in a dictionary with "in"
+         eg : "one" in filled_dict  # => True # filled_dict = {"one": 1, "two": 2, "three": 3}         
+       + From Python 3.5 you can also use the additional unpacking options
+	 {"a": 1, **{"b": 2}}  # => {'a': 1, 'b': 2}
+	 {"a": 1, **{"a": 2}}  # => {'a': 2}
+
+____________________________________________________________________________________________________________________________________________
+***INPUTS***
+- x = input("String is a default value of the input")
+- x = int(input("To take input of your desired data type wrap input func in the desired dataype func, here we have wrapped it to int"))
+
+To take multiple inputs use map function
+eg : x,y,z = map(int, input("Take input for multiple variables at once using map function").split())
+
+To take a data structure like set,tuple,list as input use the below approach
+- tuple_input = tuple(map(int, input("Create a tuple of integers. Enter your values").split()))
+
+To take a dictionary as input do the below
+eg : user_dict = {} # Start with an empty dictionary
+     num_entries = int(input("Enter the number of entries you want to add: ")) # Get the total count
+
+    for i in range(num_entries):
+    	key = input(f"Enter key {i+1}: ")
+    	value = input(f"Enter value for '{key}': ")
+    	# Optional: Convert value to integer if needed
+    	# value = int(value) 
+    	user_dict[key] = value # Assign the key-value pair
+
+    print("The created dictionary is:", user_dict)
+____________________________________________________________________________________________________________________________________________
+***Defining a variable with a type hint***
+-fundamental Python types int, float, str, and bool
+
+1. Basic data types 🖤
+eg  : user_id: int = 42 # Integer: A whole number
+
+eg2 : temperature: float = 98.6 # Float: A decimal number (equivalent to 'double' in other languages)
+
+eg3 : status_message: str = "Connected successfully!" # String: Text data
+
+eg4 : is_admin: bool = False # Boolean: True or False
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+2. Collection Data Structures 🖤
+eg  : usernames: list[str] = ["alice", "bob", "charlie"]  # List[str]: A list where every item inside must be a string
+
+eg2 : prime_numbers: list[int] = [2, 3, 5, 7, 11] # List[int]: A list containing only integers
+
+eg3 : available_tags: set[str] = {"new", "featured", "sale"} # Set[str]: A set where every item inside must be a string (useful for unique tags)
+
+eg4 : item_counts: dict[str, int] = { "apples": 5, "bananas": 10, "oranges": 3} # Dictionary: Key is a string, Value is an integer
+      user_mapping: dict[int, str] = {101: "John_D", 102: "Jane_S"} # Dictionary: Key is an integer (user ID), Value is a string (username)
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+3. Tuples with Fixed Structures 🖤
+
+eg  : gps_coordinates: tuple[float, float] = (34.05, -118.24) # Tuple: Exactly two floats, often used for coordinates (latitude, longitude)
+
+eg2 : database_record: tuple[str, int, bool] = ("Item A", 25, True) # Tuple: A string, an integer, and a boolean in that exact order
+____________________________________________________________________________________________________________________________________________
+
+***Slice in general***
+-Use any combination of these to make advanced slices
+-li[start:end:step]
+Example :
+
+li = [1,2,4,3]
+li[1:3]  # [2, 4]       # Return list from index 1 to 2 
+li[2:]   # [4, 3]       # Return list starting from index 2 => [4, 3] 
+li[:3]   # [1, 2, 4]    # Return list from beginning until index 3  => [1, 2, 4]
+li[::2]  # [1, 4]       # Return list selecting elements with a step size of 2 => [1, 4]
+li[::-1] # [3, 4, 2, 1] # Return list in reverse order => [3, 4, 2, 1]
+____________________________________________________________________________________________________________________________________________
+
+***Control Flow***
+
+1. if-elif-else 🖤
+eg : if some_var > 10:
+    	print("some_var is totally bigger than 10.")
+     elif some_var < 10:    # This elif clause is optional.
+    	print("some_var is smaller than 10.")
+     else:                  # This is optional btw
+    	print("some_var is indeed 10.")
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+2. Match/Case 🖤
+- Just like switch-case in python.
+eg : 
+    command = "run"
+    match command:
+      	 case "run":
+            print("The robot started to run")
+     	 case "speak" | "say_hi":  # multiple options (OR pattern)
+            print("The robot said hi")
+#edge -> case code if command.isdigit():  # conditional
+            print(f"The robot execute code: {code}")
+         case _:  # _ is a wildcard that never fails (like default/else)
+            print("Invalid command")
+
+____________________________________________________________________________________________________________________________________________
+
+*** Loops ***
+
+1. For loop 🖤
+
+ 🌑 Iterate over object
+    eg : list [4,5,6,7]
+	 for i in list:
+	     print(i)
+
+ 🌑 Iterate in range
+    - General syntax of range : range(start, end, step)
+      If steps aren't mentioned its default value is 1. 
+      If start isn't mentioned like in the first example it starts with 0
+      Its not start or end its more of lower and upper and step keep that in mind	 
+    eg :
+	for i in range(5):
+            print(i) # 0,1,2,3,4
+    eg2 : 
+	for i in range(1,11):
+            print(i) # 1,2,3,4,5,6,7,8,9,10
+    eg3 : 
+	for i in range(1,11,2):
+            print(i) # 1,3,5,7,9
+
+ 🌑 Loop over a list to retrieve both the index and the value of each list item:
+    eg : animals = ["dog", "cat", "mouse"]
+	 for i, value in enumerate(animals):
+    	     print(i, value) # 0 dog, 1 cat, 2 mouse
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+2. While Loops 🖤
+- While loops go until a condition is no longer met.
+  eg : 
+        x = 0
+	while x < 4:
+    	    print(x)
+    	    x += 1 
+
+____________________________________________________________________________________________________________________________________________
+
+*** Handling Exceptions with (try/except Block) ***
+eg: 
+    try:
+    	# Use "raise" to raise an error
+    	raise IndexError("This is an index error")
+    except IndexError as e:
+    	pass                 # Refrain from this, provide a recovery (next example).
+    except (TypeError, NameError):
+    	pass                 # Multiple exceptions can be processed jointly.
+    else:                    # Optional clause to the try/except block. Must follow
+                             # all except blocks.
+    	print("All good!")   # Runs only if the code in try raises no exceptions
+    finally:                 # Execute under all circumstances
+    	print("We can clean up resources here")
+____________________________________________________________________________________________________________________________________________
+
+*** Functions ***
+
+1. Declaring a function 🖤
+-Use def keyword to create a new functions. 
+eg : def add(x, y):
+    	print("x is {} and y is {}".format(x, y))
+    	return x + y
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+2. Defining variable number of arguments 🖤
+- You can define functions that take a variable number of positional arguments.
+eg : def varargs(*args):
+    	return args
+     varargs(1, 2, 3)  # => (1, 2, 3)
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+3. Defining variable number of keyword arguments 🖤
+- You can define functions that take a variable number of keyword arguments.
+eg : def keyword_args(**kwargs):
+    	return kwargs
+    keyword_args(big="foot", loch="ness")  # => {"big": "foot", "loch": "ness"}
+- You can do both at once, if you like 🖤
+eg : def all_the_args(*args, **kwargs):
+    	print(args)
+    	print(kwargs)
+     all_the_args(1, 2, a=3, b=4)
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+4. Rest operator like thing in python 🖤
+- When calling functions, you can do the opposite of args/kwargs!
+  Use * to expand args (tuples) and use ** to expand kwargs (dictionaries).
+  eg : args = (1, 2, 3, 4)
+       kwargs = {"a": 3, "b": 4}
+       all_the_args(*args)            # equivalent: all_the_args(1, 2, 3, 4)
+       all_the_args(**kwargs)         # equivalent: all_the_args(a=3, b=4)
+       all_the_args(*args, **kwargs)  # equivalent: all_the_args(1, 2, 3, 4, a=3, b=4)
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+5. Returning multiple values with tuple assignment 🖤
+- Returning multiple values (with tuple assignments)
+  eg : def swap(x, y):
+    	   return y, x  # Return multiple values as a tuple without the parenthesis.
+                        # (Note: parenthesis have been excluded but can be included)
+       x = 1
+       y = 2
+       x, y = swap(x, y)     # => x = 2, y = 1
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+6. Setting a global variable in function 🖤
+- eg : def set_global_x(num):
+    	   # global indicates that particular var lives in the global scope
+    	   global x
+    	   print(x)   # => 5
+    	   x = num    # global var x is now set to 6
+    	   print(x)   # => 6
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+7. Functions are first-class object 🖤 
+- 🛑 Functions in python are first-class objects. This means they can be used just like numbers, strings, or any other variable 🛑 
+      This(first one below) is a closure. 
+    - Closure is a function that remembers variables from the scope where it was created, even after that scope is gone.
+- eg : def create_adder(x):
+    	   def adder(y):
+           	return x + y
+           return adder
+       add_10 = create_adder(10)
+       add_10(3)   # => 13
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+8. Closures in nested functions:🖤
+-  We can use the nonlocal keyword to work with variables in nested scope which shouldn't be declared in the inner functions.
+eg : def create_avg():
+    	total = 0
+    	count = 0
+    	def avg(n):
+        	nonlocal total, count
+        	total += n
+        	count += 1
+        	return total/count
+    	return avg
+     avg = create_avg()
+     avg(3)  # => 3.0
+     avg(5)  # (3+5)/2 => 4.0
+     avg(7)  # (8+7)/3 => 5.0
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+9. Lambda functions 🖤
+- There are also anonymous functions
+eg  : (lambda x: x > 2)(3) # True. We executed the function with x = 3
+eg2 : (lambda x, y: x ** 2 + y ** 2)(2, 1)  # => 5 here (x,y) are arguments and (2,1) are values passed to argument 
+
+-There are built-in higher order functions
+eg  : list(map(add_10, [1, 2, 3]))          # => [11, 12, 13] Here we are passing add_10 declared above as first argument and each element is passed to
+            				   # the add_10 as an argument
+eg2 : list(map(max, [1, 2, 3], [4, 2, 1]))  # => [4, 2, 3] Here since max function requires two arguments we are passing two lists to it
+eg3 : list(filter(lambda x: x > 5, [3, 4, 5, 6, 7]))  # => [6, 7]
+
+- We can use list comprehensions for nice maps and filters. List comprehension stores the output as a list (which itself may be nested).
+- 🛑 Syntax : [ expression for item in iterable if condition ] 🛑 
+- 🛑 Syntax : [ WHAT_TO_APPEND   for VARIABLE in ITERABLE   if CONDITION ] 🛑
+- 🛑 Only one if, and it is a filter, not a calculation. 🛑
+eg  : [add_10(i) for i in [1, 2, 3]]         # => [11, 12, 13] This is a map
+eg2 : [x for x in [3, 4, 5, 6, 7] if x > 5]  # This is a filter
+
+- You can construct set and dict comprehensions as well.
+eg  : {x for x in "abcddeef" if x not in "abc"}  # => {'d', 'e', 'f'}
+eg2 : {x: x**2 for x in range(5)}  # => {0: 0, 1: 1, 2: 4, 3: 9, 4: 16}
+
+____________________________________________________________________________________________________________________________________________
+
+*** Classes ***
+1. Class 
+- We use the "class" statement to create a class
+- Code : (This code given below is an example of class and also a reference to all the things inside class)
+🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅
+	class Human:
+	    species = "H. sapiens"
+
+	⚫ Basic initializer, this is called when this class is instantiated.
+   	⚫ Note that the double leading and trailing underscores denote objects
+   	⚫ or attributes that are used by Python but that live in user-controlled
+   	⚫ namespaces. Methods(or objects or attributes) like: __init__, __str__,
+   	⚫ __repr__ etc. are called special methods (or sometimes called dunder
+   	⚫ methods). You should not invent such names on your own.
+	def __init__(self, name): 		⚫__init__ is automatically called when object is created. Used to initialize data
+            ⚫ Assign the argument to the instance's name attribute
+            self.name = name
+            ⚫ Initialize property
+            self._age = 0                       ⚫ the leading underscore indicates the "age" property is intended to be used internally
+                        			⚫ do not rely on this to be enforced: it's a hint to other devs
+   
+	⚫An instance method. All methods take "self" as the first argument
+    	def say(self, msg):
+            print("{name}: {message}".format(name=self.name, message=msg))
+
+	⚫ Another instance method
+   	def sing(self):
+            return "yo... yo... microphone check... one two... one two..."
+
+ 	⚫class method is shared among all instances
+ 	⚫ They are called with the calling class as the first argument
+ 	@classmethod
+ 	def get_species(cls):
+ 	    return cls.species
+
+ 	⚫A static method is called without a class or instance reference
+ 	@staticmethod
+    	def grunt():
+           return "*grunt*"
+
+	⚫ A property is just like a getter.
+    	⚫ It turns the method age() into a read-only attribute of the same name.
+    	⚫ There's no need to write trivial getters and setters in Python, though.
+    	@property
+    	def age(self):
+            return self._age
+
+   	⚫ This allows the property to be set
+   	@age.setter
+    	def age(self, age):
+            self._age = age
+
+    	⚫ This allows the property to be deleted
+    	@age.deleter
+    	def age(self):
+            del self._age
+🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅🔅
+
+2. Class attribute
+eg : class Human:
+    	species = "H. sapiens"
+     a = Human("A")
+     b = Human("B")
+
+     print(a.species)   # H. sapiens
+     print(b.species)   # H. sapiens
+
+- species is a class attribute
+- It belongs to the class itself, not any one object
+- Shared by ALL instances
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+3. __init__ (constructor)
+eg : def __init__(self, name):
+    	self.name = name
+    	self._age = 0
+     h = Human("Yugant")
+     print(h.name)
+
+-Called automatically when you create an object
+-Used to initialize data
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+4. self
+-self = the current object
+-It’s NOT a keyword, just a convention
+-It points to this particular instance
+
+eg : 
+    #What happens here?
+    self.name = name
+    #Creates:
+    h.name = "Yugant"
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+5. Why _age starts with underscore?
+eg : self._age = 0
+
+- _age is NOT private
+- Python has no true private variables
+- _ is a convention only
+- It simply means : “Hey other developers, don’t touch this directly”
+
+eg2 : #Correct usage:
+      h.age = 20     # good
+      h._age = 20    # works, but discouraged
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+6. Instance method
+eg  : def say(self, msg):
+       	  print("{name}: {message}".format(name=self.name, message=msg))
+     h.say("Hello") # Yugant: Hello
+
+eg2 : def sing(self):
+          return "yo... yo... microphone check..."
+      h.sing()
+
+- Works on one object
+- Needs self
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+7. Class method
+eg  : @classmethod
+      def get_species(cls):
+    	  return cls.species
+      #How to call it you can call it with instance and with class directly
+      Human.get_species()
+      h.get_species()
+ 
+
+- cls = the class, not an object
+- Works on class-level data
+- Why class methods exist? Ans - When logic belongs to the class as a whole, not a single object
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+8. Static method
+eg  : @staticmethod
+      def grunt():
+    	  return "*grunt*"
+      Human.grunt()
+      h.grunt()
+
+- 🛑 Static method rules 🛑: 🌑 No self 
+                             🌑 No cls 
+                             🌑 Just a function inside a class
+
+- When to use static methods? Ans - Function logically belongs to the class
+                                    But doesn’t need instance or class data
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+9. Property (VERY IMPORTANT)
+eg : @property
+     def age(self):
+    	 return self._age
+     # So instead of:
+     h.age()
+     # We write
+     h.age
+	
+- This turns a method into an attribute
+- So instead of:
+     h.age()
+  We write
+     h.age
+- It looks like a variable but runs code.
+- property is just like a getter.
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+10. Setter
+eg : @age.setter
+     def age(self, age):
+     	 self._age = age
+     # This allows:
+     h.age = 25
+
+- Why use setter? Ans -  Because later you can add validation:
+			 eg : 
+    		  	 if age < 0:
+    				raise ValueError("Age cannot be negative")
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+11. Deleter
+eg : @age.deleter
+     def age(self):
+    	 del self._age
+     del h.age
+     #Deletes the internal _age.
+
+- Deletes the internal _age.
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+12. Difference between Class Method vs Static Method
+- Core difference is that Class method knows about the class. Static method does not.
+- Think of Class Methods as “A function that operates on the class, not on an object"
+  Think fo Static Method as “A normal function that we keep inside a class for organization”
+  static method has NO automatic right to access class variables
+  and NO right to call instance methods.
+
+- But static methods can still access class variables explicitly
+  eg : class Human:
+      species = "H. sapiens"
+
+    @staticmethod🇮
+    def info():
+        return Human.species
+
+-Static method = function wearing a class’s clothes
+It lives inside the class only for organization, not power.
+
+13. __name == "__main__"
+- what is __name__? Ans - Every Python file has a special variable called __name__. Its value depends on how the file is run
+                          Case 1: File is run directly
+                                      python human.py
+                                  Then:
+                                      __name__ == "__main__"
+                          Case 2: File is imported
+                                      import human
+
+                                  Then:
+                                      __name__ == "human"
+
+- Why this exists This line means:“Run the code below only if this file is executed directly, not if it’s imported as a module.”
+- #  When a Python interpreter reads a source file it executes all its code.
+- # This __name__ check makes sure this code block is only executed when this
+- # module is the main program.
+- eg : 
+  if __name__ == "__main__":
+      # Instantiate a class
+      i = Human(name="Ian")
+      i.say("hi")                     # "Ian: hi"
+      j = Human("Joel")
+      j.say("hello")                  # "Joel: hello"
+      # i and j are instances of type Human; i.e., they are Human objects.
+
+      # Call our class method
+      i.say(i.get_species())          # "Ian: H. sapiens"
+      # Change the shared attribute
+      Human.species = "H. neanderthalensis"
+      i.say(i.get_species())          # => "Ian: H. neanderthalensis"
+      j.say(j.get_species())          # => "Joel: H. neanderthalensis"
+
+      # Call the static method
+      print(Human.grunt())            # => "*grunt*"
+
+      # Static methods can be called by instances too
+      print(i.grunt())                # => "*grunt*"
+
+      # Update the property for this instance
+      i.age = 42
+      # Get the property
+      i.say(i.age)                    # => "Ian: 42"
+      j.say(j.age)                    # => "Joel: 0"
+      # Delete the property
+      del i.age
+      # i.age                         # => this would raise an AttributeError
+
+- The above code will run directly if the file is executed directly without importing hence hte object will only be create when ran directly.
+____________________________________________________________________________________________________________________________________________
+
+*** Virtual Environment ***
+- It is suggested to have a dedicated virtual environment for each Django project, and one way to manage a virtual environment is venv, which is 
+  included in Python.
+🕳🕳Steps to create a Virtual enviornment.🕳🕳
+	🔅 The name of the virtual environment is your choice, in this tutorial we will call it myworld.
+		👉🏿 eg : python -m venv myworld
+ 	🔅 Then you have to activate the environment, by typing this command:
+		🌑 Windows:(command prompt)
+			👉🏾 eg : myworld\Scripts\activate.bat
+		🌑 Windows:(powershell)
+			👉🏾 eg : 	.\blog_project\Scripts\Activate.ps1
+
+		🌑 Unix/MacOS:
+			👉🏾 eg : source myworld/bin/activate
+
+____________________________________________________________________________________________________________________________________________
+
+*** Asyncio Library ***
+
+____________________________________________________________________________________________________________________________________________
+Some remaining things
+
+https://chatgpt.com/c/693ebec7-9ca4-8328-8792-79c41bc61dba --> second-last responese is about OOPS concept
+https://chatgpt.com/share/693f969d-1f18-8002-b228-493d54206c61
+
+Missing or Underrepresented Topics
+1.Modules & Packages
+	import, from...import, as, __init__.py, if __name__ == "__main__" usage beyond just a mention
+	Creating your own modules and packages
+	sys.path, PYTHONPATH
+
+2. File I/O
+	open(), with open(...) as f:
+	Reading/writing text and binary files
+	.read(), .readline(), .readlines(), .write(), .writelines()
+	json.load(), json.dump()
+	csv module basics
+
+3. Error Handling (Beyond Basic Try/Except)
+	Custom exceptions: class MyError(Exception): pass
+	raise, finally, else in try/except
+	Logging vs printing errors
+
+4. Iterators & Generators
+	__iter__() and __next__()
+	yield, yield from
+	Generator expressions: (x*x for x in range(5))
+	itertools module (e.g., count, cycle, chain, islice)
+
+5. Decorators
+	Function decorators: @decorator
+	@functools.wraps
+	Simple custom decorator example
+
+6. Context Managers
+	with statement
+	Custom context managers: __enter__, __exit__
+	contextlib.contextmanager
+
+7. Virtual Environments
+	venv, pip, requirements.txt
+	Why and how to isolate dependencies
+
+8. Standard Library Highlights
+	collections: Counter, defaultdict, namedtuple
+	datetime: datetime.now(), timedelta
+	os and pathlib: file system navigation
+	random: randint, choice, shuffle
+	math: ceil, floor, sqrt, log
+	re: basic regex (search, match, findall)
+
+9. Type Hints (Advanced Usage)
+	Optional, Union, List, Dict, Tuple from typing
+	-> ReturnType annotations
+	TypedDict, Protocol, Callable
+
+10. Shallow vs Deep Copy
+	copy.copy() vs copy.deepcopy()
+	Mutable objects inside containers
+
+

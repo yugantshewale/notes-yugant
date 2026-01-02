@@ -1,0 +1,35 @@
+https://claude.ai/chat/24cff82a-e6fa-432c-b228-1c3185472c07 --> how to push a project created on pc to a online repo
+
+git --version 
+git --list //tells about username and other things
+pwd .. tells about current working directory
+git config --global user.email "yugantshewale7@gmail.com" // sets user email
+git config --global user.name "Yugant Shewale" // sets username
+
+Cloning repo
+Clone - clone a repository on our local machine
+git clone <-some link->
+For cloning go to github repo click on green "code" button then copy the https link
+then type the above command 
+eg :
+git clone https://github.com/yugantshewale/Oreo-Programming-Language.git
+
+Status - displays the state of the code
+git status
+
+Add 
+Adds new or changed files in your working directory to the Git staging area
+git add <-File name->
+
+Commit 
+Commit is the record of change
+git commit -m "Some message"
+
+cd your-local-folder
+git init                            # turn this folder into a git repo
+git remote add origin https://github.com/yugantshewale/Oreo-Programming-Language.git
+git fetch origin                    # downloads all remote branches (but doesn’t merge)
+git checkout -b main origin/main    # create local main tracking origin/main
+# or, if you already have local commits that you want to keep, instead do:
+# git pull origin main
+		
