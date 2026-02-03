@@ -670,7 +670,111 @@ ________________________________________________________________________________
 ____________________________________________________________________________________________________________________________________________
 
 *** Asyncio Library ***
+- Asynchronous doesn't automatically mean faster. It just means that we can do other useful work instead of sitting idly by while waiting for things 
+  like network requests and database queries and stuff like that. That's why asyncio excels at io bound tasks, anytime your program is waiting for 
+  something external.
+- asyncIO is single threaded and runs on a single process. It uses what's called cooperative multitasking where tasks voluntarily give up control. 
+   For CPUbound tasks that need heavy computation, you'd want to use processes instead.
 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+import asyncio
+import time
+
+def sync_function(test_param: str) -> str:
+    print("This is a synchronous function.")
+    time.sleep(0.1)
+    return f"Sync Result: {test_param}"
+
+# ALSO KNOWN AS A COROUTINE FUNCTION
+async def async_function(test_param: str) -> str:
+    print("This is an asynchronous coroutine function.")
+    await asyncio.sleep(0.1)
+    return f"Async Result: {test_param}"
+
+async def main():
+    sync_result = sync_function("Test")
+    print(sync_result)
+    # loop = asyncio.get_running_loop()
+    # future = loop.create_future()  # A promise-like object
+
+    # print(f"Empty Future: {future}")
+    # future.set_result("Future Result: Test")
+
+    # future_result = await future
+    # print(future_result)
+
+    # coroutine_obj = async_function("Test")
+    # print(coroutine_obj)
+
+    # coroutine_result = await coroutine_obj
+    # print(coroutine_result)
+
+    # task = asyncio.create_task(async_function("Test"))
+    # print(task)
+
+    # task_result = await task
+    # print(task_result)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+- We can see that we have a simple synchronous function right here at the top and that just sleeps for a bit and then it returns a string. We're 
+  running this synchronous function inside of our main function. 
+- Our main function is asynchronous and we can see that it has this async keyword. Since it's an asynchronous function, we can't just call it 
+  directly. Uh in order to run our main function, we have to start what is called an event loop. And we're doing this down here at the bottom 
+  with async io.run and passing in that main async function there. 
+
+Event Loop
+- The event loop is basically the engine that runs and manages asynchronous functions. Think of it a bit as auler. It keeps track of all our tasks 
+  and when a task is suspended because it's waiting for something else uh control returns to the event loop which then finds another task to either 
+  start or resume. An event loop is a loop that keeps checking: “Who is ready to run now?”
+  The event loop runs forever like this:
+    while True:
+    	find a task that is ready
+    	run it until it hits `await`
+    	pause it
+    	remember when it can continue
+  
+  Important:
+    It runs one task at a time
+    It switches only at await
+
+  A task is ready if:
+    its sleep time is over
+    its network response arrived
+    its file read finished
+
+  So we have to be running an event loop for any of our asynchronous code to work. That's what this asyncio.run function is responsible for.
+
+Await keyword
+- We don't want to just run synchronous functions inside of our event loop. We want to use concurrency. to use concurrency. We're going to be seeing
+  this await keyword a lot. 
+- await means: “Pause this task here and give control back to the event loop.”
+- So, awaitables are objects that implement a special __await__() method under the hood. You're going to see await everywhere in asynchronous code. 
+  an object has to be awaitable for us to use that keyword on it
+- why can't we await a synchronous function like the sync_function() or time.sleep().
+  Well, synchronous libraries don't have a mechanism to work with the event loop. They don't know how to yield control over and resume later.
+  So they don't have underlying special await function that they need in order to pause their execution and start back later. These things need to
+  to be coded in to be compatible with asyncii and thats why we can't await time.sleep() and use asyncio.sleep instead. To use this await keyword
+  we also have to be within the function that has this async keyword.
+
+  code block from the above :
+    loop = asyncio.get_running_loop()
+    future = loop.create_future()  # A promise-like object
+    print(f"Empty Future: {future}")
+    future.set_result("Future Result: Test")
+    future_result = await future
+    print(future_result)
+  
+  When you await something you're basically telling the event loop to pause the execution of the current function and yeild control back to the
+  event loop which can then run another task and it'll stay suspended until this awaitable completes here it is future.
+- So in pythons aysncio there are three main types of awaitable objects
+  1. Coroutines : created when called an async function. A coroutine is a function that can be paused and resumed.
+  2. Tasks : wrappers around coroutines that are scheduled on the event loop.
+  3. Futures : low level objects representing eventual results. Think of these like promises i JS but unlike JS in python we never work with futures
+               directly. We write co-routines and when we schedule them as tasks asyncio uses futures under the hood to track those results.
 ____________________________________________________________________________________________________________________________________________
 Some remaining things
 

@@ -517,3 +517,6 @@ You’ll load this struct up a bit, and then call getaddrinfo(). It’ll return 
 these structures filled out with all the goodies you need
 more about addrinfo --> https://chatgpt.com/c/682416da-6898-8002-83de-98270b5154f9
 https://chatgpt.com/c/682416da-6898-8002-83de-98270b5154f9 -->about a project i have thought about
+___________________________________________________________________________________________________________________________________________
+https://github.com/openbsd/src/blob/master/sys/netinet/tcp_input.c --> tcp stack implementation
+https://chatgpt.com/c/696e12b3-8dc8-8322-bba8-eac1cb56cd88

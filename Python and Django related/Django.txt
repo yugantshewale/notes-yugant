@@ -434,7 +434,7 @@ eg : <a hreg = "/about">about</a>
   So for a formate like dd/mm/year we can use : {{post.content|date:"SHORT_DATE_FORMAT"}}
 ____________________________________________________________________________________________________________________________________________
 
-*** loging in Admin ***
+*** loging in Admin (create superuser ) ***
 
 - We can't log in directly we need to set default username and password. We need to create admin user so we can login for the first time.
 - First we need to create the Database to use for this project thats very easy to do just run few migration commands.

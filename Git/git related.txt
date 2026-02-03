@@ -51,4 +51,8 @@ git fetch origin                    # downloads all remote branches (but doesnâ€
 git checkout -b main origin/main    # create local main tracking origin/main
 # or, if you already have local commits that you want to keep, instead do:
 # git pull origin main
-		
+--------------------------------------------------------------------------------------------------------------------------
+
+When you clone and you just want to download the latest commit cuz when you clone a repo all commits are also cloned and its also heavy in size too
+for this you do a shallow commit 
+eg : git clone --depth=1 https://github.com/nakst/gf.git

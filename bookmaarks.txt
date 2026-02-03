@@ -16,6 +16,7 @@ https://chatgpt.com/c/6945122f-ec0c-8323-a48e-a8b640d140eb --> some django relat
 https://chatgpt.com/c/694976bf-0f04-8324-926e-43b0c3a7eed0 --> some django logout stuff related helps in solid understand
 https://chatgpt.com/c/694fbe5d-a684-8321-b9e5-96828cebcdea --> Some stuff about dango queries and cheatsheet IMP very IMP
 https://chatgpt.com/c/69573a08-0880-8322-a592-d8894d5f0a15 --> also imp for creating venv and setting up django
+https://chatgpt.com/c/69668b75-56c4-8320-9b66-1f02039531ae --> related to tables, inlines, inline-flex and stuff
 The interviewer started with networking then operating system then DBMS and at last DSA , each in depth along with many 
 questions in between .
 
