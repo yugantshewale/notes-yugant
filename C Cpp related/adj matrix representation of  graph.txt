@@ -1,0 +1,33 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX 10
+void degree(int a[][MAX],int x, int n){
+    int outcount=0,incount=0,i;
+    for(i=0;i<n;i++){//outcount means x->i and incount means i->x
+        if(a[x][i])
+            outcount++;
+        if(a[i][x])
+            incount++;
+    }
+    printf("Incount of node %d is %d \n",x+1,incount);
+    printf("Outcount of node %d is %d \n",x+1,outcount);
+    
+}
+int main()
+{
+    int adj[MAX][MAX];
+    int n,i,j;
+    printf("Entre total number of nodes in the graph\n");
+    scanf("%d",&n);
+    for(i=0;i<n;i++){
+        for(j=0;j<n;j++){
+	    adj[i][j] = 0;
+            printf("Entre edge from %d to %d (1 : Edge, 0 : No Edge) \n",i+1,j+1);
+            scanf("%d",&adj[i][j]);
+        }
+    }
+    for (i = 0; i < n; i++) {
+        degree(adj,i,n);
+    }
+    return 0;
+}

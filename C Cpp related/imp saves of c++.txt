@@ -1,0 +1,3 @@
+IMP - https://chatgpt.com/share/67b0bee6-88b0-8002-9ac6-7c60e7dfce4a
+To check which version of c++ : g++ -dM -E -x c++ - <nul | findstr __cplusplus
+To check which version of c++ compiler(to get c++ version from it) : g++ --version

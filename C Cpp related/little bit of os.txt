@@ -1,0 +1,179 @@
+What is a process ?
+--> A process is just a program that is currently running on your computer. 
+A process is an instance of a program that is being executed by a computer.
+It consists of:
+	Code – The instructions being executed.
+	Memory (RAM) – Stores variables, function calls, and program data.
+	Registers – CPU registers hold intermediate values.
+	Process ID (PID) – A unique identifier assigned by the operating system.
+	Execution State – The current stage of execution (running, waiting, etc.).
+	Threads – A process can have multiple threads that execute in parallel.
+	File Handles & Resources – Open files, network connections, etc.
+	In simple words, a process is a running program that has its own memory space and resources allocated by the OS.
+
+Process Control Block (PCB)
+The OS tracks every process using a PCB (like a passport for the process). It stores:
+	Process ID (PID): A unique number to identify the process.
+	Program Counter: Which instruction the process is executing next.
+	CPU Registers: Snapshot of the CPU state (for resuming after a pause).
+	Memory Limits: Where the process’s data/code is stored in RAM.
+	Permissions: What the process is allowed to do (e.g., access files).
+
+Process States
+A process isn’t always running—it switches between states:
+	New: Created but not yet running.
+	Ready: Loaded into memory, waiting for CPU time.
+	Running: Executing instructions on the CPU.
+	Waiting: Paused (e.g., waiting for user input or a file to load).
+	Terminated: Finished or killed.
+
+Why Processes Matter in OS
+	Concurrency: The OS runs multiple processes "at once" by switching the CPU between them (even with 1 core).
+	Isolation: If one process crashes, others stay safe (e.g., a game crash won’t shut down your entire PC).
+	Resource Management: The OS allocates CPU, memory, and I/O devices fairly.
+	Multitasking: You can browse the web while listening to music because each app runs in its own process.
+	Security: Processes can’t access each other’s memory unless allowed (prevents hacking).
+Process vs. Program
+	Program: A static file on your disk (e.g., chrome.exe).
+	Process: The program in action, loaded into memory and running.
+________________________________________________________________________________________________________________________
+What is thread, threading ?
+--> A thread is the smallest unit of execution in a process. A process is like a big task, and a thread is a 
+smaller part of that task. Multiple threads can work together inside a process to get things done faster.
+    A thread (short for "thread of execution") is the smallest unit of work that an operating system can schedule. 
+Think of it as a lightweight sub-process that runs within a process. 
+Threads share the same memory and resources of their parent process but execute tasks independently.
+
+Simple Explanation
+	Imagine a process as a kitchen where a recipe (program) is being cooked. A thread is like a chef working in that kitchen:
+	Shared Kitchen: All chefs (threads) share the same ingredients, tools, and space (process resources).
+	Independent Tasks: One chef chops veggies, another stirs soup—both work on different tasks simultaneously.
+
+What’s Inside a Thread?
+	Thread ID (TID): Unique identifier.
+	Program Counter: Tracks which instruction to execute next.
+	Stack: Stores temporary data (e.g., function calls, local variables).
+	Registers: Holds CPU state for the thread’s current task.
+	Shared Resources: Access to the process’s global data, files, and memory.
+
+Why Threads Matter
+	Concurrency: Threads allow a single process to do multiple things at once (e.g., download a file while updating the UI).
+	Efficiency: Threads are faster to create/destroy than processes (no new memory space needed).
+	Responsiveness: Apps stay interactive (e.g., a browser loading a page in the background while you scroll).
+	Resource Sharing: Threads collaborate easily by sharing data (no complex IPC required).
+
+Multi-Threading
+When a process uses multiple threads, it’s called multi-threading. There are two types:
+
+User-Level Threads: Managed by the application (e.g., Java threads).
+	Pros: Fast, OS-agnostic.
+	Cons: If one thread blocks (e.g., on I/O), the whole process blocks.
+
+Kernel-Level Threads: Managed by the OS (e.g., Windows/Linux threads).
+	Pros: OS handles blocking (one thread can wait while others run).
+	Cons: Slower to create (requires OS calls).
+
+Thread Synchronization
+	Since threads share memory, conflicts can arise (e.g., two threads editing the same variable). To prevent chaos:
+	Locks/Mutexes: Only one thread can access a resource at a time.
+	Semaphores: Limit how many threads can use a resource.
+	Deadlocks: When threads wait forever for each other (e.g., Thread A holds Lock 1 and needs Lock 2, while Thread B holds Lock 2 and needs Lock 1).
+_______________________________________________________________________________________________________________________________
+What is Multithreading ?
+-->Multithreading is the ability of a program or process to execute multiple threads concurrently (at the same time). 
+It allows a single application to perform several tasks simultaneously, improving efficiency, speed, and responsiveness. 
+Let’s break this down in simple terms and technical detail:
+
+Simple Explanation
+	Imagine you’re cooking dinner:
+	Single-threaded: You chop veggies → cook rice → bake chicken → serve. Each task happens one after the other.
+	Multithreaded: You hire two chefs (threads): Chef A chops veggies while Chef B cooks rice.
+	Both work in the same kitchen (process) and share tools (resources).	
+	This parallel work speeds up dinner prep!
+Real-world analogy:
+	A web browser uses threads to:
+	Load a webpage (Thread 1).
+	Play a video (Thread 2).
+	Check for updates (Thread 3).
+	All at the same time!
+
+Key Concepts
+1. Concurrency vs. Parallelism
+	Concurrency: Threads appear to run simultaneously (even on a single CPU core via time-slicing).
+	Parallelism: Threads truly run at the same time (on multi-core CPUs).
+
+2. Thread Sharing
+	Threads within the same process share:
+	Memory: Global variables, heap data.
+	Resources: Files, network connections.
+	Code: The program’s instructions.
+	But each thread has its own:
+		Stack: For local variables and function calls.
+		Program Counter: Tracks which instruction to execute next.
+
+3. Types of Multithreading
+	User-Level Threads: Managed by the application (e.g., Java’s threads).
+		Pros: Fast, portable.
+		Cons: Blocking one thread blocks all (e.g., if a thread waits for I/O, the whole process waits).
+	Kernel-Level Threads: Managed by the OS (e.g., Windows/Linux threads).
+		Pros: OS handles blocking (one thread can wait while others run).
+		Cons: Slower to create (requires OS calls).
+
+Why Use Multithreading?
+	Performance: Utilize multiple CPU cores for parallel processing (e.g., rendering a 3D scene).
+	Responsiveness: Keep apps interactive (e.g., a UI thread responds to clicks while a background thread loads data).
+	Efficiency: Avoid wasting CPU cycles (e.g., a thread can process data while another waits for user input).
+	Simplified Design: Break complex tasks into smaller, parallelizable units (e.g., handling 1,000 client requests in a server).
+
+Challenges of Multithreading
+	Race Conditions: Two threads modifying the same data at the same time → unpredictable results.
+		Example: Two threads incrementing a shared counter.
+	Deadlocks: Threads wait forever for each other’s resources (e.g., Thread A holds Lock 1 and needs Lock 2; Thread B holds Lock 
+		2 and needs Lock 1).
+	Starvation: A thread gets stuck waiting indefinitely for resources.
+	Debugging Complexity: Issues are non-deterministic (hard to reproduce).
+
+Synchronization Tools
+To manage thread conflicts:
+	Locks/Mutexes: Only one thread can access a resource at a time.
+	Semaphores: Limit the number of threads accessing a resource.
+	Monitors: High-level constructs to synchronize access (e.g., synchronized in Java).
+	Atomic Operations: Uninterruptible actions (e.g., incrementing a counter in one step).
+
+How Multithreading Works Under the Hood
+	Thread Creation: The OS allocates a Thread Control Block (TCB) with thread-specific data (stack, registers).
+	Thread Scheduling: The OS scheduler assigns CPU time to threads (using algorithms like Round Robin).
+	Context Switching: The CPU saves the state of the current thread and loads the next one (overhead involved).
+________________________________________________________________________________________________________________________________
+
+What is time slicing ? 
+--> Time slicing (or time-sharing) is a CPU scheduling technique used by operating systems to allow multiple processes
+or threads to share the CPU’s processing time. It works by dividing the CPU’s time into small, fixed intervals called
+time slices (or quantums), ensuring no single task monopolizes the CPU.
+
+Simple Analogy
+	Imagine a teacher helping students with homework:
+	Without Time Slicing: The teacher spends 30 minutes with one student, ignoring others.
+	With Time Slicing: The teacher gives each student 5 minutes in rotation. Everyone gets attention, and progress is fair.
+	Time slicing works similarly: the CPU switches between tasks rapidly, giving the illusion of simultaneous execution.
+
+Key Concepts
+	Time Slice (Quantum): A fixed interval (e.g., 10–100 milliseconds) allocated to a process/thread.
+			      Once the slice ends, the CPU switches to the next task.
+	Preemption: The OS interrupts a running task when its time slice expires, even if it hasn’t finished.
+	Context Switching: Saving the current task’s state (registers, program counter) and loading the next task’s state.
+	Fairness: Prevents "starvation" by ensuring all tasks get CPU time.
+
+How It Works
+	The OS scheduler maintains a ready queue of tasks.
+	Each task runs for its time slice.
+	A timer interrupt triggers when the slice ends.
+	The OS performs a context switch and schedules the next task.
+	The cycle repeats (e.g., Task A → Task B → Task C → Task A).
+
+Why Time Slicing Matters
+	Multitasking: Lets you run a browser, music player, and game "at the same time" (even on single-core CPUs).
+	Responsiveness: Keeps systems interactive (e.g., your mouse doesn’t freeze during heavy computations).
+	Fairness: No single task hogs the CPU.
+
+It’s the backbone of multitasking in modern operating systems, balancing efficiency and user experience!

@@ -1,0 +1,54 @@
+***HEADER AND HEADER FILES***
+
+Header files usually have a .h extension, but you will occasionally see them with a .hpp extension or no extension at all.
+Conventionally, header files are used to propagate a bunch of related forward declarations into a code file.
+Prefer a .h suffix when naming your header files (unless your project already follows some other convention).
+If a header file is paired with a code file (e.g. add.h with add.cpp), they should both have the same base name (add).
+
+Do not #include .cpp files 
+	Although the preprocessor will happily do so, you should generally not #include .cpp files. These should be added to your 
+	project and compiled. There are number of reasons for this:
+	Doing so can cause naming collisions between source files.
+	In a large project it can be hard to avoid one definition rules (ODR) issues.
+	Any change to such a .cpp file will cause both the .cpp file and any other .cpp file that includes it to recompile, 
+	which can take a long time. Headers tend to change less often than source files. It is non-conventional to do so.
+
+Use double quotes to include header files that you’ve written or are expected to be found in the current directory. 
+Use angled brackets to include headers that come with your compiler, OS, or third-party libraries you’ve installed elsewhere 
+on your system.
+
+Including header files from other directories
+Another common question involves how to include header files from other directories.
+One (bad) way to do this is to include a relative path to the header file you want to include as part of the #include line. 
+For example: #include "headers/myHeader.h"
+	     #include "../moreHeaders/myOtherHeader.h"
+
+Transitive includes 
+When your source (.cpp) file #includes a header file, you’ll also get any other header files that are #included by that header
+(and any header files those include, and so on). These additional header files are sometimes called transitive includes, 
+as they’re included implicitly rather than explicitly.
+
+The order of inclusion for header files
+To maximize the chance that missing includes will be flagged by compiler, order your #includes as follows 
+(skipping any that are not relevant):
+The paired header file for this code file (e.g. add.cpp should #include "add.h")
+Other headers from the same project (e.g. #include "mymath.h")
+3rd party library headers (e.g. #include <boost/tuple/tuple.hpp>)
+Standard library headers (e.g. #include <iostream>)
+The headers for each grouping should be sorted alphabetically (unless the documentation for a 3rd party library 
+instructs you to do otherwise).
+______________________________________________________________________________________________________________________________
+***HEAD GUARDS***
+header guard (also called an include guard). Header guards are conditional compilation directives that take the
+following form: #ifndef SOME_UNIQUE_NAME_HERE
+		#define SOME_UNIQUE_NAME_HERE
+		// your declarations (and certain types of definitions) here
+		#endif
+They are used to prevent duplicate definition.
+
+#pragma once
+Modern compilers support a simpler, alternate form of header guards using the #pragma preprocessor directive:
+#pragma once serves the same purpose as header guards: to avoid a header file from being included multiple times. 
+With traditional header guards, the developer is responsible for guarding the header (by using preprocessor directives 
+#ifndef, #define, and #endif). With #pragma once, we’re requesting that the compiler guard the header. How exactly it does 
+this is an implementation-specific detail.

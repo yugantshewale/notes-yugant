@@ -1,0 +1,384 @@
+The conditional operator
+
+Operator	Symbol	Form	        Meaning
+Conditional	?:	c ? x : y	If conditional c is true then evaluate x, otherwise evaluate y
+
+The conditional operator (?:) (also sometimes called the arithmetic if operator) is a ternary operator 
+(an operator that takes 3 operands). Because it has historically been C++’s only ternary operator, it’s 
+also sometimes referred to as “the ternary operator”.
+The ?: operator provides a shorthand method for doing a particular type of if-else statement.
+
+if-else statement takes the following form:
+	if (condition)
+    		statement1;
+	else
+	   	statement2;
+If condition evaluates to true, then statement1 is executed, otherwise statement2 is executed. 
+The else and statement2 are optional.
+
+The ?: operator takes the following form:
+condition ? expression1 : expression2;
+
+If condition evaluates to true, then expression1 is evaluated, otherwise expression2 is evaluated. 
+The : and expression2 are not optional.
+
+Consider an if-else statement that looks like this:
+##############################################################################
+if (x > y)
+    max = x;
+else
+    max = y;
+##############################################################################
+This can be rewritten as:
+##############################################################################
+max = ((x > y) ? x : y);
+##############################################################################
+Because C++ prioritizes the evaluation of most operators above the evaluation of the conditional 
+operator, it’s quite easy to write expressions using the conditional operator that don’t evaluate as 
+expected.
+
+For example:
+##############################################################################
+#include <iostream>
+
+int main()
+{
+    int x { 2 };
+    int y { 1 };
+    int z { 10 - x > y ? x : y };
+    std::cout << z;
+
+    return 0;
+}
+##############################################################################
+You might expect this to evaluate as 10 - (x > y ? x : y) (which would evaluate to 8) but it actually 
+evaluates as (10 - x) > y ? x : y (which evaluates to 2).
+
+Here’s another example that exhibits a common mistake:
+##############################################################################
+#include <iostream>
+
+int main()
+{
+    int x { 2 };
+    std::cout << (x < 0) ? "negative" : "non-negative";
+
+    return 0;
+}
+##############################################################################
+Here’s what’s happening in the above example. First, x < 0 evaluates to false. The partially evaluated 
+expression is now std::cout << false ? "negative" : "non-negative". Because operator<< has higher 
+precedence than operator?:, this expression evaluates as if it were written as 
+(std::cout << false) ? "negative" : "non-negative". Thus std::cout << false is evaluated, which prints 
+0 (and returns std::cout).
+
+To avoid such evaluation prioritization issues, the conditional operator should be parenthesized as 
+follows:
+Parenthesize the entire conditional operation (including operands) when used in a compound expression 
+(an expression with other operators).
+For readability, consider parenthesizing the condition if it contains any operators (other than the 
+function call operator).
+The operands of the conditional operator do not need to be parenthesized.
+
+The conditional operator is most useful when doing one of the following:
+
+Initializing an object with one of two values.
+Assigning one of two values to an object.
+Passing one of two values to a function.
+Returning one of two values from a function.
+Printing one of two values.
+Complicated expressions should generally avoid use of the conditional operator, as they tend to be error 
+prone and hard to read.
+*******************************************************************************************************
+Relational operators
+
+Comparison of calculated floating point values can be problematic
+
+Consider the following program:
+##############################################################################
+#include <iostream>
+
+int main()
+{
+    constexpr double d1{ 100.0 - 99.99 }; // should equal 0.01 mathematically
+    constexpr double d2{ 10.0 - 9.99 }; // should equal 0.01 mathematically
+
+    if (d1 == d2)
+        std::cout << "d1 == d2" << '\n';
+    else if (d1 > d2)
+        std::cout << "d1 > d2" << '\n';
+    else if (d1 < d2)
+        std::cout << "d1 < d2" << '\n';
+
+    return 0;
+}
+
+##############################################################################
+Variables d1 and d2 should both have value 0.01. But this program prints an unexpected result:
+d1 > d2
+
+If you inspect the value of d1 and d2 in a debugger, you’d likely see that d1 = 0.010000000000005116 
+and d2 = 0.0099999999999997868. Both numbers are close to 0.01, but d1 is greater than, and d2 is less
+than.
+Comparing floating point values using any of the relational operators can be dangerous. This is because
+floating point values are not precise, and small rounding errors in the floating point operands may 
+cause them to be slightly smaller or slightly larger than expected. And this can throw off the 
+relational operators.
+
+Floating point equality and inequality
+
+The equality operators (== and !=) are much more troublesome. Consider operator==, which returns true 
+only if its operands are exactly equal. Because even the smallest rounding error will cause two 
+floating point numbers to not be equal, operator== is at high risk for returning false when a true 
+might be expected. Operator!= has the same kind of problem.
+
+##############################################################################
+#include <iostream>
+int main()
+{
+    std::cout << std::boolalpha << (0.3 == 0.2 + 0.1); // prints false
+
+    return 0;
+}
+##############################################################################
+For this reason, use of these operators with floating point operands should generally be avoided.
+
+There is one notable exception case to the above: It is safe to compare a floating point literal with 
+a variable of the same type that has been initialized with a literal of the same type, so long as the 
+number of significant digits in each literal does not exceed the minimum precision for that type. 
+Float has a minimum precision of 6 significant digits, and double has a minimum precision of 15 
+significant digits.
+
+For example, you may occasionally see a function that returns a floating point literal (typically 0.0, 
+or sometimes 1.0). In such cases, it is safe to do a direct comparison against the same literal value 
+of the same type:
+
+##############################################################################
+if (someFcn() == 0.0) // okay if someFcn() returns 0.0 as a literal only
+    // do something
+##############################################################################
+Instead of a literal, we can also compare a const or constexpr floating point variable that was 
+initialized with a literal value:
+##############################################################################
+constexpr double gravity { 9.8 };
+if (gravity == 9.8) // okay if gravity was initialized with a literal
+    // we're on earth
+##############################################################################
+It is mostly not safe to compare floating point literals of different types. 
+For example, comparing 9.8f to 9.8 will return false.
+
+So how can we reasonably compare two floating point operands to see if they are equal?
+-> The most common method of doing floating point equality involves using a function that looks to see if 
+two numbers are almost the same. If they are “close enough”, then we call them equal. The value used to
+represent “close enough” is traditionally called epsilon. Epsilon is generally defined as a small 
+positive number (e.g. 0.00000001, sometimes written 1e-8).
+
+New developers often try to write their own “close enough” function like this:
+##############################################################################
+#include <cmath> // for std::abs()
+
+// absEpsilon is an absolute value
+bool approximatelyEqualAbs(double a, double b, double absEpsilon)
+{
+    // if the distance between a and b is less than or equal to absEpsilon, then a and b are 
+     //"close enough"
+    return std::abs(a - b) <= absEpsilon;
+}
+##############################################################################
+While this function can work, it’s not great. An epsilon of 0.00001 is good for inputs around 1.0, too 
+big for inputs around 0.0000001, and too small for inputs like 10,000.
+
+Donald Knuth, a famous computer scientist, suggested the following method in his book 
+“The Art of Computer Programming, Volume II: Seminumerical Algorithms (Addison-Wesley, 1969)”:
+code:
+##############################################################################
+#include <algorithm> // for std::max
+#include <cmath>     // for std::abs
+
+// Return true if the difference between a and b is within epsilon percent of the larger of a and b
+bool approximatelyEqualRel(double a, double b, double relEpsilon)
+{
+	return (std::abs(a - b) <= (std::max(std::abs(a), std::abs(b)) * relEpsilon));
+}
+//To do inequality (!=) instead of equality, simply call this function and use the logical NOT operator (!) 
+//to flip the result:
+if (!approximatelyEqualRel(a, b, 0.001))
+    std::cout << a << " is not equal to " << b << '\n';
+
+##############################################################################
+Note that while the approximatelyEqualRel() function will work for most cases, it is not perfect, 
+especially as the numbers approach zero:
+##############################################################################
+#include <algorithm> // for std::max
+#include <cmath>     // for std::abs
+#include <iostream>
+
+// Return true if the difference between a and b is within epsilon percent of the larger of a and b
+bool approximatelyEqualRel(double a, double b, double relEpsilon)
+{
+	return (std::abs(a - b) <= (std::max(std::abs(a), std::abs(b)) * relEpsilon));
+}
+
+int main()
+{
+    // a is really close to 1.0, but has rounding errors
+    constexpr double a{ 0.1 + 0.1 + 0.1 + 0.1 + 0.1 + 0.1 + 0.1 + 0.1 + 0.1 + 0.1 };
+
+    constexpr double relEps { 1e-8 };
+    constexpr double absEps { 1e-12 };
+
+    std::cout << std::boolalpha; // print true or false instead of 1 or 0
+
+    // First, let's compare a (almost 1.0) to 1.0.
+    std::cout << approximatelyEqualRel(a, 1.0, relEps) << '\n';
+
+    // Second, let's compare a-1.0 (almost 0.0) to 0.0
+    std::cout << approximatelyEqualRel(a-1.0, 0.0, relEps) << '\n';
+
+    return 0;
+}
+
+Perhaps surprisingly, this returns:
+true
+false
+##############################################################################
+
+The second call didn’t perform as expected. The math simply breaks down close to zero.
+
+One way to avoid this is to use both an absolute epsilon (as we did in the first approach) and a 
+relative epsilon (as we did in Knuth’s approach):
+##############################################################################
+// Return true if the difference between a and b is less than or equal to absEpsilon, or within 
+//relEpsilon percent of the larger of a and b
+bool approximatelyEqualAbsRel(double a, double b, double absEpsilon, double relEpsilon)
+{
+    // Check if the numbers are really close -- needed when comparing numbers near zero.
+    if (std::abs(a - b) <= absEpsilon)
+        return true;
+
+    // Otherwise fall back to Knuth's algorithm
+    return approximatelyEqualRel(a, b, relEpsilon);
+}
+##############################################################################
+In this algorithm, we first check if a and b are close together in absolute terms, which handles the case
+where a and b are both close to zero. The absEpsilon parameter should be set to something very small 
+(e.g. 1e-12). If that fails, then we fall back to Knuth’s algorithm, using the relative epsilon.
+
+In C++23, the two approximatelyEqual functions can be made constexpr by adding the constexpr keyword:
+##############################################################################
+// C++23 version
+#include <algorithm> // for std::max
+#include <cmath>     // for std::abs (constexpr in C++23)
+
+// Return true if the difference between a and b is within epsilon percent of the larger of a and b
+constexpr bool approximatelyEqualRel(double a, double b, double relEpsilon)
+{
+	return (std::abs(a - b) <= (std::max(std::abs(a), std::abs(b)) * relEpsilon));
+}
+
+// Return true if the difference between a and b is less than or equal to absEpsilon, or within 
+/relEpsilon percent of the larger of a and b
+constexpr bool approximatelyEqualAbsRel(double a, double b, double absEpsilon, double relEpsilon)
+{
+    // Check if the numbers are really close -- needed when comparing numbers near zero.
+    if (std::abs(a - b) <= absEpsilon)
+        return true;
+
+    // Otherwise fall back to Knuth's algorithm
+    return approximatelyEqualRel(a, b, relEpsilon);
+}
+##############################################################################
+*******************************************************************************************************
+Logical operators
+
+One thing to be wary of is that logical NOT has a very high level of precedence. New programmers often 
+make the following mistake:
+
+C++ has 3 logical operators:
+_________________________________________________________________________________________________
+Operator    | Symbol | Example Usage | Operation						|
+Logical NOT | !	     | !x	     | true if x is false, or false if x is true		|
+Logical AND | &&     | x && y	     | true if x and y are both true, false otherwise		|
+Logical OR  | ||     | x || y	     | true if either (or both) x or y are true, false otherwise|
+____________|________|_______________|__________________________________________________________|
+
+Warning
+
+New programmers sometimes try this:
+
+if (value == 0 || 1) // incorrect: if value is 0, or if 1
+When 1 is evaluated, it will implicitly convert to bool true. Thus this conditional will always 
+evaluate to true.
+
+If you want to compare a variable against multiple values, you need to compare the variable multiple 
+times:
+if (value == 0 || value == 1) // correct: if value is 0, or if value is 1
+
+In order for logical AND to return true, both operands must evaluate to true. If the left operand 
+evaluates to false, logical AND knows it must return false regardless of whether the right operand 
+evaluates to true or false. In this case, the logical AND operator will go ahead and return false 
+immediately without even evaluating the right operand! This is known as short circuit evaluation, and it 
+is done primarily for optimization purposes.
+Similarly, if the left operand for logical OR is true, then the entire OR condition has to evaluate to 
+true, and the right operand won’t be evaluated.
+Short circuit evaluation presents another opportunity to show why operators that cause side effects 
+should not be used in compound expressions. Consider the following snippet:
+##################################################################################
+if (x == 1 && ++y == 2)
+    // do something
+##################################################################################
+if x does not equal 1, the whole condition must be false, so ++y never gets evaluated! Thus, y will only 
+be incremented if x evaluates to 1, which is probably not what the programmer intended!
+
+logical AND has higher precedence than logical OR, thus logical AND operators will be evaluated ahead of 
+logical OR operators (unless they have been parenthesized).
+
+When mixing logical AND and logical OR in a single expression, explicitly parenthesize each operation to 
+ensure they evaluate how you intend.
+
+De Morgan’s laws tell us how the logical NOT should be distributed in these cases:
+
+!(x && y) is equivalent to !x || !y
+!(x || y) is equivalent to !x && !y
+
+Where’s the logical exclusive or (XOR) operator?
+
+Logical XOR is a logical operator provided in some languages that is used to test whether an odd number 
+of conditions is true:
+C++ doesn’t provide an explicit logical XOR operator (operator^ is a bitwise XOR, not a logical XOR).
+Unlike logical OR or logical AND, logical XOR cannot be short circuit evaluated. Because of this, making 
+a logical XOR operator out of logical OR and logical AND operators is challenging.
+
+However, operator!= produces the same result as a logical XOR when given bool operands:
+
+
+Left operand	Right operand	logical XOR	operator!=
+false		false		false		false
+false		true		true		true
+true		false		true		true
+true		true		false		false
+Therefore, a logical XOR can be implemented as follows:
+
+if (a != b) ... // a XOR b, assuming a and b are bool
+This can be extended to multiple operands as follows:
+
+if (a != b != c) ... // a XOR b XOR c, assuming a, b, and c are bool
+This evaluates to true if an odd number of the operands (a, b, and c) evaluate to true.
+If the operands are not of type bool, using operator!= to implement a logical XOR will not work as 
+expected
+
+
+If you need a form of logical XOR that works with non-Boolean operands, you can static_cast your 
+operands to bool:
+if (static_cast<bool>(a) != static_cast<bool>(b) != static_cast<bool>(c)) ... // a XOR b XOR c, for any 
+type that can be converted to bool
+
+However, this is a bit verbose. The following trick also works and is a bit more concise:
+if (!!a != !!b != !!c) // a XOR b XOR c, for any type that can be converted to bool
+
+This makes use of the fact that operator! (the logical NOT operator) implicitly converts its operand to 
+bool. However, operator! also inverts the bool from true to false or vice-versa. Therefore, we need to 
+apply operator! twice. The first time does the implicit conversion to bool and inverts the bool. The 
+second time inverts the bool back to its original value. This double-inversion is necessary in cases 
+where a multiple-operand XOR has an odd number of operands, otherwise the XOR will produce an inverted 
+result.

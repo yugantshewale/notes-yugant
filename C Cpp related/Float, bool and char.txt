@@ -1,0 +1,329 @@
+***Float***
+C++ floating point types
+___________________________________________________
+Category       | C++ Type    | Typical Size	  |
+_______________|_____________|____________________|
+floating point | float	     | 4 bytes		  |		
+	       | double	     | 8 bytes		  |
+	       | long double | 8, 12, or 16 bytes |
+_______________|_____________|____________________|
+
+On modern architectures, floating-point types are conventionally implemented using one of the floating-point 
+formats defined in the IEEE 754 standard 
+
+float is almost always implemented using the 4-byte IEEE 754 single-precision format.
+double is almost always implemented using the 8-byte IEEE 754 double-precision format.
+However, the format used to implement long double varies by platform. Common choices include:
+8-byte IEEE 754 double-precision format (same as double).
+80-bit (often padded to 12 or 16 bytes) x87 extended-precision format (compatible with IEEE 754).
+16-byte IEEE 754 quadruple-precision format.
+16-byte double-double format (not compatible with IEEE 754).
+
+Floating point range
+______________________________________________________________________________________________________________________________
+Format					| Range					    | Precision				     |
+________________________________________|___________________________________________|________________________________________|
+IEEE 754 single-precision (4 bytes)	| ±1.18 x 10-38 to ±3.4 x 1038 and 0.0	    | 6-9 significant digits, typically 7    |
+IEEE 754 double-precision (8 bytes)	| ±2.23 x 10-308 to ±1.80 x 10308 and 0.0   | 15-18 significant digits, typically 16 |
+x87 extended-precision (80 bits)	| ±3.36 x 10-4932 to ±1.18 x 104932 and 0.0 | 18-21 significant digits		     |		
+IEEE 754 quadruple-precision (16 bytes) | ±3.36 x 10-4932 to ±1.18 x 104932 and 0.0 | 33-36 significant digits		     |
+________________________________________|___________________________________________|________________________________________|
+
+Floating point precision
+The precision of a floating point type defines how many significant digits it can represent without information loss.
+The number of digits of precision a floating point type has depends on both the size (floats have less precision than doubles)
+and the particular value being stored (some values can be represented more precisely than others).
+For example, a float has 6 to 9 digits of precision. This means that a float can exactly represent any number with up to 
+6 significant digits. A number with 7 to 9 significant digits may or may not be represented exactly depending on the specific 
+value. And a number with more than 9 digits of precision will definitely not be represented exactly.
+Double values have between 15 and 18 digits of precision, with most double values having at least 16 significant digits.
+Long double has a minimum precision of 15, 18, or 33 significant digits depending on how many bytes it occupies.
+
+Outputting floating point values
+When outputting floating point numbers, std::cout has a default precision of 6 -- that is, it assumes all floating point 
+variables are only significant to 6 digits (the minimum precision of a float), and hence it will truncate anything after that.
+We can override the default precision that std::cout shows by using an output manipulator function named std::setprecision(). 
+Output manipulators alter how data is output, and are defined in the iomanip header.
+
+Tip
+Output manipulators (and input manipulators) are sticky -- meaning if you set them, they will remain set.
+The one exception is std::setw. Some IO operations reset std::setw, so std::setw should be used every time it is needed.
+
+Precision issues don’t just impact fractional numbers, they impact any number with too many significant digits. 
+Let’s consider a big number:
+
+#include <iomanip> // for std::setprecision()
+#include <iostream>
+
+int main()
+{
+    float f { 123456789.0f }; // f has 10 significant digits
+    std::cout << std::setprecision(9); // to show 9 digits in f
+    std::cout << f << '\n';
+
+    return 0;
+}
+
+Output:
+123456792
+
+123456792 is greater than 123456789. The value 123456789.0 has 10 significant digits, but float values typically have 7 
+digits of precision (and the result of 123456792 is precise only to 7 significant digits). We lost some precision! 
+When precision is lost because a number can’t be stored precisely, this is called a rounding error.
+
+Best practice
+Favor double over float unless space is at a premium, as the lack of precision in a float will often lead to inaccuracies.
+
+Rounding errors make floating point comparisons tricky
+Floating point numbers are tricky to work with due to non-obvious differences between binary (how data is stored) and decimal 
+(how we think) numbers. Consider the fraction 1/10. In decimal, this is easily represented as 0.1, and we are used to thinking 
+of 0.1 as an easily representable number with 1 significant digit. However, in binary, decimal value 0.1 is represented by the 
+infinite sequence: 0.00011001100110011… Because of this, when we assign 0.1 to a floating point number, we’ll run into precision 
+problems.
+You can see the effects of this in the following program:
+
+#include <iomanip> // for std::setprecision()
+#include <iostream>
+
+int main()
+{
+    double d{0.1};
+    std::cout << d << '\n'; // use default cout precision of 6
+    std::cout << std::setprecision(17);
+    std::cout << d << '\n';
+
+    return 0;
+}
+This outputs:
+0.1
+0.10000000000000001
+
+On the bottom line, where we have std::cout show us 17 digits of precision, we see that d is actually not quite 0.1! 
+This is because the double had to truncate the approximation due to its limited memory. The result is a number that is precise 
+to 16 significant digits (which type double guarantees), but the number is not exactly 0.1. Rounding errors may make a number 
+either slightly smaller or slightly larger, depending on where the truncation happens.
+
+Rounding errors can have unexpected consequences:
+Consider:
+#include <iomanip> // for std::setprecision()
+#include <iostream>
+
+int main()
+{
+    std::cout << std::setprecision(17);
+
+    double d1{ 1.0 };
+    std::cout << d1 << '\n';
+
+    double d2{ 0.1 + 0.1 + 0.1 + 0.1 + 0.1 + 0.1 + 0.1 + 0.1 + 0.1 + 0.1 }; // should equal 1.0
+    std::cout << d2 << '\n';
+
+    return 0;
+}
+Output:
+1
+0.99999999999999989
+Although we might expect that d1 and d2 should be equal, we see that they are not. 
+If we were to compare d1 and d2 in a program, the program would probably not perform as expected. 
+Because floating point numbers tend to be inexact, comparing floating point numbers is generally problematic 
+
+One last note on rounding errors: mathematical operations (such as addition and multiplication) tend to make 
+rounding errors grow. So even though 0.1 has a rounding error in the 17th significant digit, when we add 0.1 ten times, 
+the rounding error has crept into the 16th significant digit. Continued operations would cause this error to become 
+increasingly significant.
+
+NaN and Inf
+IEEE 754 compatible formats additionally support some special values:
+
+Inf 
+	which represents infinity. Inf is signed, and can be positive (+Inf) or negative (-Inf).
+
+NaN
+	which stands for “Not a Number”. There are several different kinds of NaN (which we won’t discuss here).
+	Signed zero, meaning there are separate representations for “positive zero” (+0.0) and “negative zero” (-0.0).
+Formats that are not compatible with IEEE 754 may not support some (or any) of these values. In such cases, code that uses 
+or generates these special values will produce implementation-defined behavior.
+
+_______________________________________________________________________________________________________________________________
+*******************************************************************************************************************************
+BOOL
+Boolean variables are variables that can have only two possible values: true, and false.
+To declare a Boolean variable, we use the keyword bool.
+ust as the unary minus operator (-) can be used to make an integer negative, the logical NOT operator (!) can be used to 
+flip a Boolean value from true to false, or false to true:
+Boolean values are not actually stored in Boolean variables as the words “true” or “false”. 
+Instead, they are stored as integral values: true is stored as integer 1, and false is stored as integer 0. 
+Similarly, when Boolean values are evaluated, they don’t actually evaluate to “true” or “false”. 
+They evaluate to the integers 0 (false) or 1 (true). Because Booleans store integral values, they are considered to be an 
+integral type.
+
+Use std::boolalpha to print true or false
+If you want std::cout to print true or false instead of 0 or 1, you can output std::boolalpha. 
+This doesn’t output anything, but manipulates the way std::cout outputs bool values.
+Here’s an example:
+
+#include <iostream>
+
+int main()
+{
+    std::cout << true << '\n';
+    std::cout << false << '\n';
+
+    std::cout << std::boolalpha; // print bools as true or false
+
+    std::cout << true << '\n';
+    std::cout << false << '\n';
+    return 0;
+}
+
+This prints:
+1
+0
+true
+false
+
+You can use std::noboolalpha to turn it back off.
+
+Integer to Boolean conversion
+When using uniform initialization, you can initialize a variable using integer literals 0 (for false) and 1 (for true) 
+(but you really should be using false and true instead). Other integer literals cause compilation errors:
+However, in any context where an integer can be converted to a Boolean, the integer 0 is converted to false, 
+and any other integer is converted to true.
+
+Inputting Boolean values
+By default, std::cin only accepts numeric input for Boolean variables: 0 is false, and 1 is true. 
+Any other numeric value will be interpreted as true, and will cause std::cin to enter failure mode. 
+Any non-numeric value will be interpreted as false and will cause std::cin to enter failure mode.
+To allow std::cin to accept the words false and true as inputs, you must first input to std::boolalpha:
+example :
+#include <iostream>
+
+int main()
+{
+	bool b{};
+	std::cout << "Enter a boolean value: ";
+
+	// Allow the user to input 'true' or 'false' for boolean values
+	// This is case-sensitive, so True or TRUE will not work
+	std::cin >> std::boolalpha;
+	std::cin >> b;
+
+	// Let's also output bool values as `true` or `false`
+	std::cout << std::boolalpha;
+	std::cout << "You entered: " << b << '\n';
+
+	return 0;
+}
+
+Note that we use std::cin >> std::boolalpha; to input bool values as true or false, and std::cout << std::boolalpha; 
+to output bool values as true or false. These are independent controls that can be turned on (using std::boolalpha) 
+or off (using std::noboolalpha) separately.
+_______________________________________________________________________________________________________________________________
+*******************************************************************************************************************************
+Char
+The char data type was designed to hold a single character. A character can be a single letter, number, symbol, or whitespace.
+The char data type is an integral type, meaning the underlying value is stored as an integer. Similar to how a Boolean value 0 
+is interpreted as false and non-zero is interpreted as true, the integer stored by a char variable are intepreted as an ASCII 
+character.
+ASCII stands for American Standard Code for Information Interchange, and it defines a particular way to represent English 
+characters (plus a few other symbols) as numbers between 0 and 127 (called an ASCII code or code point). 
+For example, ASCII code 97 is interpreted as the character ‘a’.
+Here is the link for a full table of ASCII characters:
+link : https://www.learncpp.com/cpp-tutorial/chars/#:~:text=full%20table%20of%20ASCII%20characters%3A
+
+Initializing chars
+You can initialize char variables using character literals:
+example : 
+char ch2{ 'a' }; // initialize with code point for 'a' (stored as integer 97) (preferred)
+You can initialize chars with integers as well, but this should be avoided if possible
+char ch1{ 97 }; // initialize with integer 97 ('a') (not preferred)
+
+Note that std::cin will let you enter multiple characters. 
+However, variable ch can only hold 1 character. Consequently, only the first input character is extracted into variable ch. 
+The rest of the user input is left in the input buffer that std::cin uses, and can be extracted with subsequent calls to 
+std::cin.
+You can see this behavior in the following example:
+
+#include <iostream>
+
+int main()
+{
+    std::cout << "Input a keyboard character: "; // assume the user enters "abcd" (without quotes)
+
+    char ch{};
+    std::cin >> ch; // ch = 'a', "bcd" is left queued.
+    std::cout << "You entered: " << ch << '\n';
+
+    // Note: The following cin doesn't ask the user for input, it grabs queued input!
+    std::cin >> ch; // ch = 'b', "cd" is left queued.
+    std::cout << "You entered: " << ch << '\n';
+
+    return 0;
+}
+
+Output:
+Input a keyboard character: abcd
+You entered: a
+You entered: b
+If you want to read in more than one char at a time (e.g. to read in a name, word, or sentence), you’ll want to use a 
+string instead of a char. A string is a collection of sequential characters (and thus, a string can hold multiple symbols). 
+
+Extracting whitespace characters
+Because extracting input ignores leading whitespace, this can lead to unexpected results when trying to extract whitespace 
+characters to a char variable:
+
+#include <iostream>
+
+int main()
+{
+    std::cout << "Input a keyboard character: "; // assume the user enters "a b" (without quotes)
+
+    char ch{};
+    std::cin >> ch; // extracts a, leaves " b\n" in stream
+    std::cout << "You entered: " << ch << '\n';
+
+    std::cin >> ch; // skips leading whitespace (the space), extracts b, leaves "\n" in stream
+    std::cout << "You entered: " << ch << '\n';
+
+    return 0;
+}
+Output:
+Input a keyboard character: a b
+You entered: a
+You entered: b
+
+In the above example, we may have expected to extract the space, but because leading whitespace is skipped, we extracted the b 
+character instead.
+One simple way to address this is to use the std::cin.get() function to perform the extraction instead, as this function does 
+not ignore leading whitespace:
+
+Char size, range, and default sign
+
+Char is defined by C++ to always be 1 byte in size. By default, a char may be signed or unsigned (though it’s usually signed). 
+If you’re using chars to hold ASCII characters, you don’t need to specify a sign (since both signed and unsigned chars can hold 
+values between 0 and 127).
+If you’re using a char to hold small integers (something you should not do unless you’re explicitly optimizing for space), 
+you should always specify whether it is signed or unsigned. A signed char can hold a number between -128 and 127. 
+An unsigned char can hold a number between 0 and 255.
+
+Escape sequences(symbols like '\n' and '\t')
+There are some sequences of characters in C++ that have special meaning. These characters are called escape sequences. 
+An escape sequence starts with a ‘\’ (backslash) character, and then a following letter or number.
+You’ve already seen the most common escape sequence: '\n', which can be used to print a newline:
+
+Here is the link for a full table of escape sequences:
+link : https://www.learncpp.com/cpp-tutorial/chars/#:~:text=Here%E2%80%99s%20a%20table,by%20hex%20number
+
+What about the other char types, wchar_t, char8_t, char16_t, and char32_t?
+Much like ASCII maps the integers 0-127 to American English characters, other character encoding standards exist to map 
+integers (of varying sizes) to characters in other languages. The most well-known mapping outside of ASCII is the Unicode 
+standard, which maps over 144,000 integers to characters in many different languages. Because Unicode contains so many code 
+points, a single Unicode code point needs 32-bits to represent a character (called UTF-32).
+However, Unicode characters can also be encoded using multiple 16-bit or 8-bit characters (called UTF-16 and UTF-8 respectively).
+char16_t and char32_t were added to C++11 to provide explicit support for 16-bit and 32-bit Unicode characters. 
+These char types have the same size as std::uint_least16_t and std::uint_least32_t respectively (but are distinct types). 
+char8_t was added in C++20 to provide support for 8-bit Unicode (UTF-8). It is a distinct type that uses the same representation 
+as unsigned char.
+You won’t need to use char8_t, char16_t, or char32_t unless you’re planning on making your program Unicode compatible. 
+wchar_t should be avoided in almost all cases (except when interfacing with the Windows API), as its size is 
+implementation-defined.

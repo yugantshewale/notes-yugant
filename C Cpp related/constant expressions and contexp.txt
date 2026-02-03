@@ -1,0 +1,481 @@
+The As-If Rule
+The as-if rule is a guarantee provided by the C++ standard. It allows the compiler to change or rearrange the code in any way it 
+wants, as long as the program behaves exactly as it would if it were executed exactly as written
+It gives compilers the freedom to perform aggressive optimizations (like removing unnecessary calculations or reordering 
+operations) without the risk of altering the program’s observable behavior (output, side effects, etc.).
+The as-if rule is always in effect during the compilation process. The compiler continuously uses it as a guiding principle 
+when optimizing your code.
+
+Compile-Time Optimization
+Compile-time optimizations are improvements the compiler makes to your code while it is being transformed from human-readable 
+C++ into machine code. These optimizations are applied before the program runs.
+To generate machine code that runs faster, uses less memory, or both.
+The compiler analyzes your code for patterns, constants, or redundancies and tries to optimize based on those.
+
+Constant expressions
+A constant expression is an expression whose value is known and fully determined at compile time (i.e., when your program is 
+being compiled), rather than when the program is running.
+Why Are Constant Expressions Beneficial?
+--> Improved Performance:
+Since the values are computed during compilation, the program doesn't have to perform these calculations at runtime. 
+This can make your program faster because less work is done while the program is running.
+Enhanced Safety:
+Because constant expressions are immutable (unchangeable once set), they help prevent bugs that can arise from unexpected changes 
+to values.
+Usage in Compile-Time Contexts:
+Constant expressions can be used in situations that require compile-time constants
+
+Runtime expression vs compile time expressions
+-----------------------------------------------------------------------------------------------------------------------------
+Aspect              | Constant Expression                                   | Runtime Expression			    |
+-----------------------------------------------------------------------------------------------------------------------------
+When Evaluated      | At compile time (during compilation)                  | At runtime (when the program is executed)     |
+-----------------------------------------------------------------------------------------------------------------------------
+Performance         | No runtime computation needed; improves performance   | Computation occurs during program execution,  |
+		    |							    | possibly slowing down performance		    |
+-----------------------------------------------------------------------------------------------------------------------------
+Mutability          | Immutable (their value never changes)                 | Can change during the execution of the program|
+-----------------------------------------------------------------------------------------------------------------------------
+Allowed Uses        | Can be used where compile-time constants are required | Cannot be used in contexts that require 	    |
+		    |							    | compile-time values			    |
+-----------------------------------------------------------------------------------------------------------------------------
+Side Effects        | Must not produce side effects (e.g., no modifying     | May involve side effects (modifying state,    |
+                    | variables, no I/O operations)                         | I/O operations)				    |
+-----------------------------------------------------------------------------------------------------------------------------
+Examples            | `constexpr int a = 10;`, `constexpr int b = a + 5;`   | int x = someFunction();` (if `someFunction()` |
+		    |							    |is not `constexpr`)			    |
+-----------------------------------------------------------------------------------------------------------------------------
+
+Examples of constant and non constant expression
+
+#include <iostream>
+
+int getNumber()
+{
+    std::cout << "Enter a number: ";
+    int y{};
+    std::cin >> y; // can only execute at runtime
+
+    return y;      // this return expression is a runtime expression
+}
+
+// The return value of a non-constexpr function is a runtime expression
+// even when the return expression is a constant expression
+int five()
+{
+    return 5;      // this return expression is a constant expression
+}
+
+int main()
+{
+    // Literals can be used in constant expressions
+    5;                           // constant expression
+    1.2;                         // constant expression
+    "Hello world!";              // constant expression
+
+    // Most operators that have constant expression operands can be used in constant expressions
+    5 + 6;                       // constant expression
+    1.2 * 3.4;                   // constant expression
+    8 - 5.6;                     // constant expression (even though operands have different types)
+    sizeof(int) + 1;             // constant expression (sizeof can be determined at compile-time)
+
+    // The return values of non-constexpr functions can only be used in runtime expressions
+    getNumber();                 // runtime expression
+    five();                      // runtime expression (even though the return expression is a constant expression)
+
+    // Operators without constant expression operands can only be used in runtime expressions
+    std::cout << 5;              // runtime expression (std::cout isn't a constant expression operand)
+
+    return 0;
+}
+
+example 2 
+// Const integral variables with a constant expression initializer can be used in constant expressions:
+const int a { 5 };           // a is usable in constant expressions
+const int b { a };           // b is usable in constant expressions (a is a constant expression per the prior statement)
+const long c { a + 2 };      // c is usable in constant expressions (operator+ has constant expression operands)
+
+// Other variables cannot be used in constant expressions (even when they have a constant expression initializer):
+int d { 5 };                 // d is not usable in constant expressions (d is non-const)
+const int e { d };           // e is not usable in constant expressions (initializer is not a constant expression)
+const double f { 1.2 };      // f is not usable in constant expressions (not a const integral variable)
+
+example 3
+const int x { 3 + 4 }; // constant expression 3 + 4 must be evaluated at compile-time
+int y { 3 + 4 };       // constant expression 3 + 4 may be evaluated at compile-time or runtime
+
+example 4
+char a { 'q' };
+q' is a constant expression because it is a literal.
+a is a non-constant expression because it is defined as non-const.
+
+example 5
+const double c { 5.0 };
+'5.0' is a constant expression because it is a literal.
+c is a non-constant expression because it is defined as const but does not have an integral type.
+Per the definition of a compile-time constant, only const integral variables with a constant expression initializer 
+are compile-time constants. c is a double, which is not an integral type, so it does not meet this definition.
+
+example 6
+const int d { a * 2 }; // a defined as char a { 'q' };
+a is not a constant expression, so a * 2 is a non-constant expression.
+d is a non-constant expression since the initializer is not a constant expression.
+
+example 7
+const int g { getNumber() }; // getNumber returns an int by value
+getNumber() returns a non-constant value, so it is a non-constant expression.
+g is a non-constant expression because the initializer is a non-constant expression.
+NOTE: Functions are always evaluated at runtime even if their return value are constant making function runtime expressions
+
+_______________________________________________________________________________________________________________________________
+constexpr
+
+The compile-time const challenge
+In the prior lesson, we noted that one way to create a variable that can be used in a constant expression is to use the const 
+keyword. A const variable with an integral type and a constant expression initializer can be used in a constant expression. 
+All other const variables cannot be used in constant expressions.
+However, the use of const to create variables that can be used in constant expressions has a few challenges.
+First, use of const does not make it immediately clear whether the variable is usable in a constant expression or not. 
+In some cases, we can figure it out fairly easily:
+
+The constexpr keyword
+Fortunately, we can enlist the compiler’s help to ensure we get a compile-time constant variable where we desire one. 
+To do so, we use the constexpr keyword (which is shorthand for “constant expression”) instead of const in a variable’s 
+declaration. A constexpr variable is always a compile-time constant. As a result, a constexpr variable must be initialized 
+with a constant expression, otherwise a compilation error will result.
+Additionally, constexpr works for variables with non-integral types:
+constexpr double d { 1.2 }; // d can be used in constant expressions!
+
+The meaning of const vs constexpr for variables
+For variables:
+const means that the value of an object cannot be changed after initialization. The value of the initializer may be known at 
+compile-time or runtime. The const object can be evaluated at runtime.
+constexpr means that the object can be used in a constant expression. The value of the initializer must be known at compile-time. 
+The constexpr object can be evaluated at runtime or compile-time.
+Constexpr variables are implicitly const. Const variables are not implicitly constexpr (except for const integral variables with 
+a constant expression initializer). Although a variable can be defined as both constexpr and const, in most cases this is 
+redundant, and we only need to use either const or constexpr.
+
+Unlike const, constexpr is not part of an object’s type. Therefore a variable defined as constexpr int actually has type const 
+int (due to the implicit const that constexpr provides for objects).
+
+Any constant variable whose initializer is a constant expression should be declared as constexpr.
+Any constant variable whose initializer is not a constant expression (making it a runtime constant) should be declared as const. 
+________________________________________________________________________________________________________________________________
+String view
+Consider the following program:
+
+#include <iostream>
+
+int main()
+{
+    int x { 5 }; // x makes a copy of its initializer
+    std::cout << x << '\n';
+
+    return 0;
+}
+When the definition for x is executed, the initialization value 5 is copied into the memory allocated for variable int x. For fundamental types, initializing and copying a variable is fast.
+
+Now consider this similar program:
+
+#include <iostream>
+#include <string>
+
+int main()
+{
+    std::string s{ "Hello, world!" }; // s makes a copy of its initializer
+    std::cout << s << '\n';
+
+    return 0;
+}
+When s is initialized, the C-style string literal "Hello, world!" is copied into memory allocated for std::string s. 
+Unlike fundamental types, initializing and copying a std::string is slow.
+In the above program, all we do with s is print the value to the console, and then s is destroyed. We’ve essentially made a 
+copy of “Hello, world!” just to print and then destroy that copy. That’s inefficient.
+
+We see something similar in this example:
+#include <iostream>
+#include <string>
+void printString(std::string str) // str makes a copy of its initializer
+{
+    std::cout << str << '\n';
+}
+int main()
+{
+    std::string s{ "Hello, world!" }; // s makes a copy of its initializer
+    printString(s);
+
+    return 0;
+}
+This example makes two copies of the C-style string “Hello, world!”: one when we initialize s in main(), and another when we 
+initialize parameter str in printString(). That’s a lot of needless copying just to print a string!   
+
+To address the issue with std::string being expensive to initialize (or copy), C++17 introduced std::string_view 
+(which lives in the <string_view> header). std::string_view provides read-only access to an existing string (a C-style string, 
+a std::string, or another std::string_view) without making a copy. Read-only means that we can access and use the value being 
+viewed, but we can not modify it.
+
+The following example is identical to the prior one, except we’ve replaced std::string with std::string_view.
+#include <iostream>
+#include <string_view> // C++17
+// str provides read-only access to whatever argument is passed in
+void printSV(std::string_view str) // now a std::string_view
+{
+    std::cout << str << '\n';
+}
+int main()
+{
+    std::string_view s{ "Hello, world!" }; // now a std::string_view
+    printSV(s);
+
+    return 0;
+}
+
+This program produces the same output as the prior one, but no copies of the string “Hello, world!” are made.
+When we initialize std::string_view s with C-style string literal "Hello, world!", s provides read-only access to 
+“Hello, world!” without making a copy of the string. When we pass s to printSV(), parameter str is initialized from s. 
+This allows us to access “Hello, world!” through str, again without making a copy of the string.
+
+Best practice
+Prefer std::string_view over std::string when you need a read-only string, especially for function parameters.   
+
+std::string_view can be initialized with many different types of strings
+
+One of the neat things about a std::string_view is how flexible it is. A std::string_view object can be 
+initialized with a C-style string, a std::string, or another std::string_view:   
+eg :
+    std::string_view s1 { "Hello, world!" }; // initialize with C-style string literal
+    std::cout << s1 << '\n';
+
+    std::string s{ "Hello, world!" };
+    std::string_view s2 { s };  // initialize with std::string
+    std::cout << s2 << '\n';
+
+    std::string_view s3 { s2 }; // initialize with std::string_view
+    std::cout << s3 << '\n';   
+
+std::string_view parameters will accept many different types of string arguments
+
+Both a C-style string and a std::string will implicitly convert to a std::string_view. Therefore, a std::string_view parameter 
+will accept arguments of type C-style string, a std::string, or std::string_view:      
+eg :
+#include <iostream>
+#include <string>
+#include <string_view>
+
+void printSV(std::string_view str)
+{
+    std::cout << str << '\n';
+}
+
+int main()
+{
+    printSV("Hello, world!"); // call with C-style string literal
+
+    std::string s2{ "Hello, world!" };
+    printSV(s2); // call with std::string
+
+    std::string_view s3 { s2 };
+    printSV(s3); // call with std::string_view
+
+    return 0;
+}
+
+std::string_view will not implicitly convert to std::string
+
+Because std::string makes a copy of its initializer (which is expensive), C++ won’t allow implicit conversion of a 
+std::string_view to a std::string. This is to prevent accidentally passing a std::string_view argument to a std::string parameter,
+and inadvertently making an expensive copy where such a copy may not be required.
+However, if this is desired, we have two options:
+Explicitly create a std::string with a std::string_view initializer (which is allowed, since this will rarely be done unintentionally)
+Convert an existing std::string_view to a std::string using static_cast  
+
+constexpr std::string_view
+Unlike std::string, std::string_view has full support for constexpr:        
+
+std::string is a (sole) owner
+
+You might be wondering why std::string makes an expensive copy of its initializer. When an object is instantiated, memory is 
+allocated for that object to store whatever data it needs to use throughout its lifetime. This memory is reserved for the object, 
+and guaranteed to exist for as long as the object does. It is a safe space. std::string (and most other objects) copy the 
+initialization value they are given into this memory so that they can have their own independent value to access and manipulate 
+later. Once the initialization value has been copied, the object is no longer reliant on the initializer in any way. 
+
+Should I prefer std::string_view or const std::string& function parameters? 
+Prefer std::string_view                                                     
+           
+Improperly using std::string_view
+eg:
+#include <iostream>
+#include <string>
+#include <string_view>
+
+int main()
+{
+    std::string_view sv{};
+
+    { // create a nested block
+        std::string s{ "Hello, world!" }; // create a std::string local to this nested block
+        sv = s; // sv is now viewing s
+    } // s is destroyed here, so sv is now viewing an invalid string
+
+    std::cout << sv << '\n'; // undefined behavior
+
+    return 0;
+}
+eg2 :
+#include <iostream>
+#include <string>
+#include <string_view>
+
+std::string getName()
+{
+    std::string s { "Alex" };
+    return s;
+}
+
+int main()
+{
+  std::string_view name { getName() };// name initialized with return value of function after this statement getName() initializer
+				      // is being destroyed hence string_view is pointing at nothing
+  std::cout << name << '\n'; // undefined behavior
+
+  return 0;
+}          
+getName() function is returning a std::string containing the string “Alex”. Return values are temporary objects that are 
+destroyed at the end of the full expression containing the function call We must either use this return value immediately,
+or copy it to use later. But std::string_view doesn’t make copies. And hence the error
+                                                                                          
+eg 3 :
+#include <iostream>
+#include <string>
+#include <string_view>
+
+int main()
+{
+    using namespace std::string_literals;
+    std::string_view name { "Alex"s }; // "Alex"s creates a temporary std::string
+    std::cout << name << '\n'; // undefined behavior
+
+    return 0;
+}
+A std::string literal (created via the s literal suffix) creates a temporary std::string object. So in this case, "Alex"s 
+creates a temporary std::string, which we then use as the initializer for name. At this point, name is viewing the temporary 
+std::string. Then the temporary std::string is destroyed, leaving name dangling. We get undefined behavior when we then use name. 
+
+Warning
+Do not initialize a std::string_view with a std::string literal, as this will leave the std::string_view dangling.
+It is okay to initialize a std::string_view with a C-style string literal or a std::string_view literal. It’s also okay to 
+initialize a std::string_view with a C-style string object, a std::string object, or a std::string_view object, as long as that 
+string object outlives the view.      
+
+We can also get undefined behavior when the underlying string is modified:
+eg 4: 
+#include <iostream>
+#include <string>
+#include <string_view>
+
+int main()
+{
+    std::string s { "Hello, world!" };
+    std::string_view sv { s }; // sv is now viewing s
+
+    s = "Hello, a!";    // modifies s, which invalidates sv (s is still valid)
+    std::cout << sv << '\n';   // undefined behavior(outputs : Hello, a!ld!)
+
+    return 0;
+}
+Modifying a std::string is likely to invalidate all views into that std::string.
+
+Be careful returning a std::string_view
+
+std::string_view can be used as the return value of a function. However, this is often dangerous.
+Because local variables are destroyed at the end of the function, returning a std::string_view that is viewing a local variable 
+will result in the returned std::string_view being invalid, and further use of that std::string_view will result in undefined 
+behavior.      
+There are two main cases where a std::string_view can be returned safely. First, because C-style string literals exist for the
+entire program, it’s fine (and useful) to return C-style string literals from a function that has a return type of 
+std::string_view.       
+Second, it is generally okay to return a function parameter of type std::string_view:
+eg for second : 
+#include <iostream>
+#include <string>
+#include <string_view>
+
+std::string_view firstAlphabetical(std::string_view s1, std::string_view s2)
+{
+    if (s1 < s2)
+        return s1;
+    return s2;
+}
+
+int main()
+{
+    std::string a { "World" };
+    std::string b { "Hello" };
+
+    std::cout << firstAlphabetical(a, b) << '\n'; // prints "Hello"
+
+    return 0;
+}
+
+View modification functions
+Because std::string_view is a view, it contains functions that let us modify our view by “closing the curtains”. 
+This does not modify the string being viewed in any way, just the view itself  
+    The remove_prefix() member function removes characters from the left side of the view.
+    The remove_suffix() member function removes characters from the right side of the view.
+eg :
+#include <iostream>
+#include <string_view>
+
+int main()
+{
+	std::string_view str{ "Peach" };
+	std::cout << str << '\n';
+
+	// Remove 1 character from the left side of the view
+	str.remove_prefix(1);
+	std::cout << str << '\n';
+
+	// Remove 2 characters from the right side of the view
+	str.remove_suffix(2);
+	std::cout << str << '\n';
+
+	str = "Peach"; // reset the view
+	std::cout << str << '\n';
+
+	return 0;
+}
+
+output :         
+Peach
+each
+ea
+Peach
+
+once remove_prefix() and remove_suffix() have been called, the only way to reset the view is by reassigning the source string 
+to it again.             
+
+std::string_view can view a substring
+
+std::string_view may or may not be null-terminated
+The ability to view just a substring of a larger string comes with one consequence of note: a std::string_view may or may not be 
+null-terminated.                                  
+Consider the string “snowball”, which is null-terminated (because it is a C-style string literal, which are always 
+null-terminated). If a std::string_view views the whole string, then it is viewing a null-terminated string. However, if 
+std::string_view is only viewing the substring “now”, then that substring is not null-terminated (the next character is a ‘b’).
+
+Key insight
+A C-style string literal and a std::string are always null-terminated.
+A std::string_view may or may not be null-terminated.
+
+Warning
+Take care not to write any code that assumes a std::string_view is null terminated.
+
+Tip
+If you have a non-null-terminated std::string_view and you need a null-terminated string for some reason, convert 
+the std::string_view into a std::string.
+
+In almost all cases, this doesn’t matter -- a std::string_view keeps track of the length of the string or substring it is viewing,
+so it doesn’t need the null-terminator. Converting a std::string_view to a std::string will work regardless of whether or not the
+std::string_view is null-terminated.                                                                                                                                                                                                                                
