@@ -1560,3 +1560,242 @@ class PostDeleteView(LoginRequiredMixin,UserPassesTestMixin ,DeleteView):
         return False
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 __________________________________________________________________________________________________________________________________________________
+
+*** Some Notes about Class based views in Django and what methods should we override and create ***
+
+Most Common Generic Views You’ll Use
+
+These are the main ones you should understand deeply:
+
+ListView → show list of objects
+DetailView → show single object
+CreateView → create object
+UpdateView → edit object
+DeleteView → delete object
+FilterView (from django-filter) → list + filtering
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+What You Usually Define (NOT override)
+
+These are class attributes — you just assign values.
+
+1. model
+code : model = Item
+Tells Django which model to use.
+
+2. template_name
+code : template_name = "order_task_tracking/get_summary.html"
+Tells Django which template to render. 
+
+3. context_object_name (optional but clean)
+Instead of using object_list in template:
+code : context_object_name = "items"
+Cleaner and more readable.
+
+4. filterset_class (for FilterView)
+code : filterset_class = SummaryFilter
+Connects your filter logic.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+What You Override When Needed
+(https://chatgpt.com/c/698566f1-4974-83aa-9d40-1690d4141492)
+(https://chatgpt.com/share/698c7463-2314-8002-8b11-f851e621075f)
+You override methods when you want to change behavior.
+
+1. get_queryset() ← VERY COMMON
+
+Use this when:
+
+	You want custom filtering
+	You want annotations
+	You want aggregation
+	You want complex logic
+
+code : 
+def get_queryset(self):
+    qs = super().get_queryset()
+    return qs.filter(active=True)
+
+
+Important pattern:
+
+Always start with:
+
+code : qs = super().get_queryset()
+
+Then modify it.
+You should NOT start from Item.objects unless you intentionally want to bypass built-in filtering.
+
+2. get_context_data() ← VERY IMPORTANT
+
+Use this when you want to send extra data to template.
+
+code:
+
+def get_context_data(self, **kwargs):
+    context = super().get_context_data(**kwargs)
+    context['total_orders'] = 50
+    return context
+
+
+If you forget super(), you break the page.
+
+3. form_valid() (for CreateView / UpdateView)
+
+Used when you want to modify object before saving.
+
+coe:
+
+def form_valid(self, form):
+    form.instance.created_by = self.request.user
+    return super().form_valid(form)
+
+
+Simple Summary 
+
+Define:
+
+model
+template_name
+filterset_class
+
+Override:
+
+get_queryset() → for data logic
+get_context_data() → for extra template data
+form_valid() → for save logic
+
+----------------------------------------------------------------------------------------
+about F() --> https://chatgpt.com/c/69a53b6a-5c2c-8322-8b0f-12ffe6e3b2ed
+              https://chatgpt.com/share/69bbc7f7-7eb4-8002-abdd-b2f4c3ee91b9
+
+Related to views and groupby() --> https://chatgpt.com/c/69849222-a514-8320-ae8e-d4f8ea26f945
+                                   https://chatgpt.com/share/69bbc81a-67c4-8002-b84b-ab2b4795e946
+________________________________________________________________________________________________________________________________________________
+*** Adding Postgres to django (I did in wsl[Ubuntu]) ***
+Linke to the chat : https://chatgpt.com/c/69be713e-d2e4-8320-b82a-f8b12e331b29
+                    https://chatgpt.com/share/69be8241-e9b0-8002-8b0b-d53aea1f3c16
+
+Step 1 :
+First install pgsql in wsl directly using the commands
+Command : 
+	sudo apt update
+	sudo apt install postgresql postgresql-contrib
+
+----------------------------------------------------------------------------------------
+
+Step 2 :
+Command : sudo apt install libpq-dev python3-dev
+
+It installs development libraries needed to build certain Python packages (like psycopg2) from source.
+
+libpq-dev
+	This is the PostgreSQL client development library
+	It provides header files and tools needed to compile programs that talk to PostgreSQL
+	It lets Python packages “understand how to communicate with PostgreSQL at a low level”
+
+python3-dev
+	Contains Python header files and build tools
+	Needed when compiling Python extensions written in C
+	Without this, some packages that include native code won’t build
+
+Why is this needed?
+There are two versions of the PostgreSQL adapter:
+
+----------------------------------------------------------------------------------------
+
+Step 3: PostgreSQL adapter for Python
+
+Command(Production) : pip install psycopg2
+         OR
+Command : pip install psycopg2-binary
+
+What exactly is psycopg2?
+	It’s a database driver.
+	Django itself doesn’t directly “speak” to PostgreSQL
+	It uses psycopg2 as a translator
+
+----------------------------------------------------------------------------------------
+
+Step 4 : Start PostgreSQL service in WSL
+
+Sometimes it is installed but not running.
+Command : sudo service postgresql start
+
+Check status if its running
+Command : sudo service postgresql status
+
+----------------------------------------------------------------------------------------
+
+Step 5 : Create a database for Django
+
+Switch to the postgres user:
+Command : sudo -u postgres psql
+
+Now run these commands inside PostgreSQL:
+###################################################################################
+CREATE DATABASE docsign_db;
+CREATE USER docsign_user WITH PASSWORD 'strongpassword';
+ALTER ROLE docsign_user SET client_encoding TO 'utf8';
+ALTER ROLE docsign_user SET default_transaction_isolation TO 'read committed';
+ALTER ROLE docsign_user SET timezone TO 'UTC';
+GRANT ALL PRIVILEGES ON DATABASE docsign_db TO docsign_user;
+###################################################################################
+
+Then connect to your database(eg here is docsign_db)
+Command : \c docsign_db 
+Then
+Command : GRANT ALL ON SCHEMA public TO docsign_user;
+	  ALTER SCHEMA public OWNER TO docsign_user;
+
+Then exit
+Command : \q
+
+----------------------------------------------------------------------------------------
+
+Step 6 : Update Django settings.py
+
+In settings.py find the database section and replace it with 
+###################################################################################
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'docsign_db',
+        'USER': 'docsign_user',
+        'PASSWORD': 'strongpassword',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+}
+###################################################################################
+
+----------------------------------------------------------------------------------------
+
+Step 7 : Run migrations
+
+Command : python manage.py migrate
+This will create all Django tables in PostgreSQL instead of SQLite.
+
+Optional but recommended (reset SQLite migrations cleanly)
+If this project already had SQLite migrations, sometimes conflicts happen.
+If migrations fail, run:
+Command :
+	python manage.py makemigrations
+	python manage.py migrate
+
+----------------------------------------------------------------------------------------
+
+Step 8 : check if everything works
+
+Command : python manage.py dbshell
+Output : psql (16.x)
+	 docsign_db=#
+
+----------------------------------------------------------------------------------------
+
+Step 9 : If django fails to connect to DB
+
+Run the following command in wsl
+Command : sudo service postgresql start
+
+And then run the server
