@@ -1,0 +1,194 @@
+What is a “Token” in Django (or APIs)?
+-> A token is like a temporary password/key that proves: “This user is logged in and allowed to access protected APIs.”
+   Simple analogy
+   You sign up / login → server gives you a token
+   You use that token for future requests instead of sending password again
+   Like:
+   Login = getting a gate pass
+   Token = showing that pass every time you enter
+
+   ---------------------------------------------------------------------------------
+   Why tokens are used
+   Instead of sending:
+   {
+     "email": "test@test.com",
+     "password": "12345678"
+   }
+   Sending this every time ❌ (unsafe)
+
+   You send:
+   Authorization: Token abc123xyz
+   ✔ safer
+   ✔ faster
+   ✔ standard for APIs
+
+   ---------------------------------------------------------------------------------
+   How it works (flow)
+   1. Signup/Login
+
+   You create user → generate token:
+
+   token, _ = Token.objects.get_or_create(user=user)
+   2. API response
+   {
+     "token": "a94f8c2e1b7d..."
+   }
+   3. Client stores token
+   Mobile app / frontend saves it
+   4. Future requests
+   Authorization: Token a94f8c2e1b7d...
+
+   ---------------------------------------------------------------------------------
+   ⚙️ In Django REST Framework (DRF)
+
+   When you use:
+   from rest_framework.authtoken.models import Token
+
+   Django creates something like:
+   {
+     "user": 1,
+     "token": "a94f8c2e1b7d..."
+   }
+
+_______________________________________________________________________________________________________________________________________________
+
+*** Adding Postgres to django (I did in wsl[Ubuntu]) ***
+Linke to the chat : https://chatgpt.com/c/69be713e-d2e4-8320-b82a-f8b12e331b29
+                    https://chatgpt.com/share/69be8241-e9b0-8002-8b0b-d53aea1f3c16
+
+Step 1 :
+First install pgsql in wsl directly using the commands
+Command : 
+	sudo apt update
+	sudo apt install postgresql postgresql-contrib
+
+----------------------------------------------------------------------------------------
+
+Step 2 :
+Command : sudo apt install libpq-dev python3-dev
+
+It installs development libraries needed to build certain Python packages (like psycopg2) from source.
+
+libpq-dev
+	This is the PostgreSQL client development library
+	It provides header files and tools needed to compile programs that talk to PostgreSQL
+	It lets Python packages “understand how to communicate with PostgreSQL at a low level”
+
+python3-dev
+	Contains Python header files and build tools
+	Needed when compiling Python extensions written in C
+	Without this, some packages that include native code won’t build
+
+Why is this needed?
+There are two versions of the PostgreSQL adapter:
+
+----------------------------------------------------------------------------------------
+
+Step 3: PostgreSQL adapter for Python
+
+Command(Production) : pip install psycopg2
+         OR
+Command : pip install psycopg2-binary
+
+What exactly is psycopg2?
+	It’s a database driver.
+	Django itself doesn’t directly “speak” to PostgreSQL
+	It uses psycopg2 as a translator
+
+----------------------------------------------------------------------------------------
+
+Step 4 : Start PostgreSQL service in WSL
+
+Sometimes it is installed but not running.
+Command : sudo service postgresql start
+
+Check status if its running
+Command : sudo service postgresql status
+
+----------------------------------------------------------------------------------------
+
+Step 5 : Create a database for Django
+
+Switch to the postgres user:
+Command : sudo -u postgres psql
+
+Now run these commands inside PostgreSQL:
+###################################################################################
+CREATE DATABASE docsign_db;
+CREATE USER docsign_user WITH PASSWORD 'strongpassword';
+ALTER ROLE docsign_user SET client_encoding TO 'utf8';
+ALTER ROLE docsign_user SET default_transaction_isolation TO 'read committed';
+ALTER ROLE docsign_user SET timezone TO 'UTC';
+GRANT ALL PRIVILEGES ON DATABASE docsign_db TO docsign_user;
+###################################################################################
+
+Then connect to your database(eg here is docsign_db)
+Command : \c docsign_db 
+Then
+Command : GRANT ALL ON SCHEMA public TO docsign_user;
+	  ALTER SCHEMA public OWNER TO docsign_user;
+
+Then exit
+Command : \q
+
+----------------------------------------------------------------------------------------
+
+Step 6 : Update Django settings.py
+
+In settings.py find the database section and replace it with 
+###################################################################################
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'docsign_db',
+        'USER': 'docsign_user',
+        'PASSWORD': 'strongpassword',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+}
+###################################################################################
+
+----------------------------------------------------------------------------------------
+
+Step 7 : Run migrations and add to INSTALLED_APPS settings.py
+
+Adding to INSTALLED_APPS settings.py 
+INSTALLED_APPS = [
+    'rest_framework',
+    'rest_framework.authtoken', #I am using authtoken for autherization that's why I added them
+]
+
+Command : python manage.py migrate
+This will create all Django tables in PostgreSQL instead of SQLite.
+
+Optional but recommended (reset SQLite migrations cleanly)
+If this project already had SQLite migrations, sometimes conflicts happen.
+If migrations fail, run:
+Command :
+	python manage.py makemigrations
+	python manage.py migrate
+
+----------------------------------------------------------------------------------------
+
+Step 8 : check if everything works
+
+Command : python manage.py dbshell
+Output : psql (16.x)
+	 docsign_db=#
+
+----------------------------------------------------------------------------------------
+
+Step 9 : If django fails to connect to DB
+
+Run the following command in wsl
+Command : sudo service postgresql start
+
+And then run the server
+_____________________________________________________________________________________________________________________________________________
+*** IMP Saves ***
+About Customized Registeration in DRF : https://chatgpt.com/c/69bed4ae-0708-8324-b4d9-db4cf793d0df
+					https://chatgpt.com/share/69bfba49-9158-8002-9aef-064b494cfa94
+
+More about Customized Registeration in DRF/Tokens/INSTALLED_APPS and erros : https://chatgpt.com/c/69bee9f5-c084-8320-82bb-ad557f03e8b9
+									     https://chatgpt.com/share/69bfbaa6-7df8-8002-a503-63e6c8ebda58
