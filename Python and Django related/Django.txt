@@ -89,7 +89,9 @@ eg : (myworld) ... $ python -m pip install Django
 eg : django-admin startproject my_blog_project 
 
 
-if you dont want this structure use this command to create : django-admin startproject config . in root directory it doesn't create a new dir inside
+if you dont want this structure use this command to create 
+	command : 🖤 django-admin startproject config . 🖤 that is 🖤 django-admin startproject NAME . 🖤
+in root directory it doesn't create a new dir inside
 the root directory called my_blog_project it assumes the root dir is the dir so you won't get a structure like this
  	     ├── my_blog_project/     
 	     │   ├── __init__.py
@@ -1671,6 +1673,11 @@ about F() --> https://chatgpt.com/c/69a53b6a-5c2c-8322-8b0f-12ffe6e3b2ed
 
 Related to views and groupby() --> https://chatgpt.com/c/69849222-a514-8320-ae8e-d4f8ea26f945
                                    https://chatgpt.com/share/69bbc81a-67c4-8002-b84b-ab2b4795e946
+
+Django Update View --> https://chatgpt.com/c/697a2d92-07b8-8320-878f-40de362c6c47
+		       https://chatgpt.com/share/69c2ba5f-6f88-8002-8dd4-be48ffc5a554
+
+
 ________________________________________________________________________________________________________________________________________________
 *** Adding Postgres to django (I did in wsl[Ubuntu]) ***
 Linke to the chat : https://chatgpt.com/c/69be713e-d2e4-8320-b82a-f8b12e331b29

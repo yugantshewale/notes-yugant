@@ -1,0 +1,39 @@
+*** Base Views ***
+The base view class. All other class-based views inherit from this base class. It isn’t strictly a generic view and thus can also be imported 
+from django.views.
+
+Example:
+⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺
+from django.http import HttpResponse
+from django.views import View
+
+class MyView(View):
+    def get(self, request, *args, **kwargs):
+        return HttpResponse("Hello, World!")
+⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺⏺
+
+Attributes
+
+http_method_names
+The list of HTTP method names that this view will accept.
+Default: ["get", "post", "put", "patch", "delete", "head", "options", "trace"]
+
+Methods
+classmethod as_view(**initkwargs)
+as_view() is a class method that converts your view class into a callable function that Django can use.
+Django expects a function when handling requests, but CBVs are classes—so as_view() bridges that gap.
+
+response = MyView.as_view()(request)
+
+This means:
+MyView.as_view() → returns a function
+That function is then called with request
+
+What does as_view() return?
+It returns a callable view function with extra attributes:
+
+view_class → the original class (MyView)
+view_initkwargs → any arguments passed into as_view()
+
+More on this and .as_view and some python things : https://chatgpt.com/c/69cbc493-7024-8323-8be5-987a5efe6bf8
+						   https://chatgpt.com/share/69cf3d32-56f8-8321-b399-1ae7fadc116f

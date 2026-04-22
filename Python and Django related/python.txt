@@ -776,6 +776,67 @@ Await keyword
   3. Futures : low level objects representing eventual results. Think of these like promises i JS but unlike JS in python we never work with futures
                directly. We write co-routines and when we schedule them as tasks asyncio uses futures under the hood to track those results.
 ____________________________________________________________________________________________________________________________________________
+
+### **kwargs and *args ###
+In Python, *args and **kwargs are used in function definitions to allow a variable number of arguments.
+
+*args (Non-keyword arguments)
+    It collects extra positional arguments into a tuple.
+    Use it when you don’t know how many arguments will be passed.
+
+````````````````````````````````````````````````````````````````````````````````
+Example :
+def add_numbers(*args):
+    return sum(args)
+
+print(add_numbers(1, 2, 3))      # 6
+print(add_numbers(5, 10, 15, 20))  # 50
+
+Output : 6
+  	 50
+````````````````````````````````````````````````````````````````````````````````
+
+**kwargs (Keyword arguments)
+It collects extra keyword arguments into a dictionary.
+Use it when you want named arguments but don’t know how many.
+
+````````````````````````````````````````````````````````````````````````````````
+Example:
+def print_info(**kwargs):
+    for key, value in kwargs.items():
+        print(f"{key} = {value}")
+
+print_info(name="Alice", age=25)
+
+Output : {'name': 'Alice', 'age': 25}
+````````````````````````````````````````````````````````````````````````````````
+
+Using both together
+````````````````````````````````````````````````````````````````````````````````
+Example : 
+def demo(*args, **kwargs):
+    print("Positional:", args)
+    print("Keyword:", kwargs)
+
+demo(1, 2, 3, name="Bob", age=30)
+
+Output : Positional: (1, 2, 3)
+	 Keyword: {'name': 'Bob', 'age': 30}
+
+Note : + Here, while calling function ORDER MATTERS!!!
+         Example :
+		  demo(1, 2, 3, name="Bob", age=30) ✅ Valid
+		  demo(1, name="Bob", 2, 3, age=30) ❎ Invalid
+       + Even inside function definitions, order matters:
+	 Example :
+		  def func(a, *args, **kwargs): # ✅ Valid
+    			pass
+		  
+		  def func(**kwargs, *args):  # ❌ invalid
+    			pass
+````````````````````````````````````````````````````````````````````````````````
+____________________________________________________________________________________________________________________________________________
+
 Some remaining things
 
 https://chatgpt.com/c/693ebec7-9ca4-8328-8792-79c41bc61dba --> second-last responese is about OOPS concept
