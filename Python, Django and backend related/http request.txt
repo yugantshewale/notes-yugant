@@ -1,0 +1,73 @@
+⚽Full HTTP Request Structure⚽
+
+Every HTTP request is:
+-----------------------------------------
+    <Request Line>
+    <Headers>
+
+    <Body / Payload>
+-----------------------------------------
+👉 3 parts only.
+
+Examples :
+
+✅ Example 1: A POST request say you hit the route (example.com/signup) and click on submit button
+
+-----------------------------------------
+    POST /signup/ HTTP/1.1        ← Request Line
+
+    Host: example.com             ← Headers
+    Content-Type: application/json
+    Content-Length: 85
+
+    {                             ← Payload (Body)
+    "username": "yugant",
+    "email": "yugant@gmail.com",
+    "password": "123456"
+    }
+-----------------------------------------
+
+✅ Example 2: A GET request say you hit the route (google.com/blog/1)
+
+-----------------------------------------
+GET /blog/1 HTTP/1.1          ← Request Line
+
+Host: google.com              ← Headers
+User-Agent: Mozilla/5.0
+Accept: text/html
+Accept-Language: en-US
+Connection: keep-alive
+
+(no body)                     ← No payload here
+-----------------------------------------
+
+______________________________________________________________________________________________________________________________________________________
+
+What is a Header?
+A header = metadata (information about the request, not the main data)
+
+Think:
+Headers = “instructions + description”
+
+Examples:
+Host → which server
+Content-Type → format of body
+User-Agent → which browser
+Authorization → login token
+
+What is Payload (Body)?
+Payload = actual data you are sending
+
+In your POST:
+
+{
+  "username": "yugant",
+  "email": "yugant@gmail.com",
+  "password": "123456"
+}
+
+This is the real content
+
+
+link - https://chatgpt.com/c/69f4a730-c490-8322-8073-688e00bed4a2
+       https://chatgpt.com/share/69f5b401-7000-83a2-8fe4-b785950b1722

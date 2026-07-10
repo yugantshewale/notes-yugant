@@ -1,0 +1,20 @@
+Never push static files, database and migrations to github in django.
+💿💿💿💿💿💿💿💿💿💿💿💿💿
+Example (.gitignore)
+# Ignore database
+db.sqlite3
+*.sqlite3
+
+# Static files
+staticfiles/
+
+#Migrations
+**/migrations/*.py
+**/migrations/__init__.py
+💿💿💿💿💿💿💿💿💿💿💿💿💿
+
+Always create virtual enviornment
+
+Always add .env file to store imp credentials
+
+Always freeze requirements

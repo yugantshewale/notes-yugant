@@ -1,0 +1,157 @@
+*** Oauth ***
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OAuth is for authorization, not authentication.
+That means OAuth is mainly about giving one app limited access to your data on another service, without sharing your password.
+For example: a website wants permission to read your Google Calendar. OAuth lets you do that safely.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The main players in OAuth
+
+1. Resource Owner
+That is the user. You.
+
+2. Client
+The app that wants access. For example, a travel app asking to read your calendar.
+
+3. Authorization Server
+The server that checks your login and gives permission. Example: Google login server.
+
+4. Resource Server
+The server that actually stores the data. Example: Google Calendar API server.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Terminologies 
+
+👤 Resource Owner
+What it is: The actual human user who owns the data.
+In your app: The person who wants their WhatsApp messages to create Google Calendar events. 
+	     It's their calendar, so they are the "owner" of that resource.
+
+🖥️Client
+What it is: YOUR application — the thing trying to access the user's data. Called "client" because it's a client of the API.
+In your app: Your Django server. It's knocking on Google's door saying "I want access to this user's calendar."
+
+🏦 Authorization Server
+What it is: The server that handles login and permission granting. It's the one that shows the user the 
+	    "Do you allow this app to access your calendar?" screen.
+In your app: accounts.google.com — Google's dedicated auth server.
+
+📦 Resource Server
+What it is: The server that actually holds the data you want to access. It accepts tokens and returns data.
+In your app: www.googleapis.com/calendar — Google's Calendar API server.
+
+🃏 client_id
+What it is: A public identifier for YOUR app. Google needs to know which app is requesting access.
+How you get it: When you register your app in Google Cloud Console, Google assigns you a client_id. 
+		It looks like: 123456789-abc123def456.apps.googleusercontent.com
+		Is it secret? NO. It's public. It can be in your frontend code. Everyone can see it.
+
+🔑 client_secret
+What it is: A private password that only YOUR server and Google know. Proves that the request is really coming from your app and not someone 
+	    pretending to be your app.
+	    Is it secret? YES. Never put this in frontend code, never commit it to GitHub. Store in environment variables.
+
+🔭 Scope
+What it is: The specific permissions your app is requesting. OAuth lets you ask for only what you need.
+Examples:
++------------------------------------------------------------------------------+
+| https://www.googleapis.com/auth/calendar          ← Full calendar access     |
+| https://www.googleapis.com/auth/calendar.events   ← Only create/edit events  |
+| https://www.googleapis.com/auth/calendar.readonly ← Only read, can't modify  |
++------------------------------------------------------------------------------+
+Why it matters: If you only ask for calendar.events, Google will tell the user "This app wants to manage your calendar events" — not 
+		"This app wants full access to everything." Users trust limited scopes more.
+
+🎟️ Authorization Code
+What it is: A short-lived, one-time-use code that Google sends to your server after the user approves. It's NOT the final access token — 
+	    it's an intermediate step.
+Why not send the token directly? Security. 
+The code travels through the browser (which can be intercepted). The token exchange happens server-to-server directly, 
+which is much safer.
+Lifetime: Usually 10 minutes. Use it once and it expires.
+
+🎫 Access Token
+What it is: The actual "pass" your app uses to access the API. Included in every API request.
+How it looks in an API call:
++-------------------------------------------------------------------------+
+| GET https://www.googleapis.com/calendar/v3/calendars/primary/events     |
+| Authorization: Bearer ya29.a0AfB_byC...   ← this is the access token    |
++-------------------------------------------------------------------------+
+Lifetime: Short. Google's access tokens expire in 1 hour. This limits damage if stolen.
+Is it secret? YES. Never expose it.
+
+♻️ Refresh Token
+What it is: A long-lived token used to get a NEW access token when the current one expires — without asking the user to log in again.
+Lifetime: Until the user revokes access or you haven't used it in 6 months.
+Critical insight: This is what you store in your database. Your app uses the refresh token to silently get new access tokens in the 
+                  background forever.
+
+🔀 Redirect URI
+What it is: The URL on YOUR server that Google will send the user back to after they approve (or deny) access. 
+	    You register this in Google Cloud Console.
+Example: https://yoursite.com/auth/google/callback
+Security rule: Google will ONLY redirect to URLs you pre-registered. 
+	       This prevents attackers from stealing the authorization code by redirecting to their own server.
+
+🎲 State Parameter
+What it is: A random string your app generates and sends with the OAuth request. Google sends it back unchanged. You verify it matches.
+Why: Prevents CSRF attacks — without state, an attacker could trick your server into accepting an authorization code meant for them.
++-----------------------------------------------------------------------------------+
+| import secrets								    |
+| state = secrets.token_urlsafe(32)  # Store in session, verify when Google returns |
++-----------------------------------------------------------------------------------+
+_________________________________________________________________________________________________________________________________________________
+*** The Complete Flow of Oauth ***
+https://chatgpt.com/c/69dbd0eb-a470-8324-94c1-d56bbc4072c4
+
+_________________________________________________________________________________________________________________________________________________
+
+*** About Oauth in whatsapp to calender app in TogetherVsolve ***
+
+1. User texts "start"
+
+2. Your server builds a Google URL:
+   accounts.google.com/o/oauth2/auth
+   ?client_id=ABC123
+   &redirect_uri=https://yoursite.com/auth/callback/
+   &scope=calendar
+   &state=917820851066        ← phone number, carried through
+
+3. Your server sends user's browser to that URL
+   (this is what redirect(auth_url) does in your code)
+
+4. Google shows consent screen:
+   "Do you want to give this app calendar access?"
+
+5. User clicks Allow
+
+6. Google tells browser:
+   "Go to https://yoursite.com/auth/callback/?code=XYZ789"
+   Browser visits that URL → your Django view runs
+
+7. Your server sends to Google:
+   code=XYZ789  +  client_id=ABC123  +  client_secret=GOCSPX-xxx
+   (this is what flow.fetch_token(code=code) does)
+
+8. Google verifies all three match → sends back:
+   access_token  = use this to call Calendar API
+   refresh_token = use this to get new access tokens
+
+9. You save both in DB linked to phone number
+   (update_or_create in your callback view)
+
+10. Done. User never needs to log in again.
+
+_______________________________________________________________________________________________________________________________________________
+
+https://developers.google.com/workspace/calendar/api/v3/reference/events#resource-representations
+https://developers.google.com/workspace/calendar/api/guides/create-events#python
+
+Good insights on Oauth --> https://chatgpt.com/c/69e3c2b4-a2fc-8321-bdd8-3a0095a6c959
+			   https://chatgpt.com/share/69e8debd-be20-8323-9fa8-08765be85ccb
+Good insights on Oauth part 2 --> https://chatgpt.com/c/69e78893-7010-8321-8e91-ca3dc9bc0871
+                           	  https://chatgpt.com/share/69e8df19-9390-8324-a397-6d9001db2827
+Good insights on Oauth part 3 --> https://claude.ai/chat/c2b97598-41d9-4819-b2be-f3b97fbd7ce8
+				  https://claude.ai/share/b02cd6fa-eac3-49af-8753-3e37f2d18b5d
+
+
+https://developers.facebook.com/apps/1656053505581029/use_cases/customize/wa-settings/?use_case_enum=WHATSAPP_BUSINESS_MESSAGING&product_route=whatsapp-business&business_id=1250654033472094&selected_tab=wa-settings
+https://console.cloud.google.com/auth/clients?project=whatsapp-to-calender-new

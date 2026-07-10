@@ -1,0 +1,18 @@
+Authentication
+Authentication is the process of verifying the identity of a user or system. It ensures that the user is legitimate by validating credentials like passwords, OTPs, or biometrics.
+
+Authorization
+Authorization determines the access rights and permissions of an authenticated user. It decides what resources the user can access and what actions they are allowed to perform.
+
+
+
+Authentication	                                             Authorization
+Verifies who the user is	                                 Determines what the user can access
+Performed before authorization	                             Happens after authentication
+Requires login details (username, password, biometrics)	     Requires user roles, privileges, or access levels
+Determines if the user is valid	                             Determines what permissions the valid user has
+Uses ID Tokens	                                             Uses Access Tokens
+Governed by OpenID Connect (OIDC)	                         Governed by OAuth 2.0
+Credentials can be changed by the user	                     Permissions can only be changed by the system owner
+Visible to the user (entering credentials)	                 Not visible to the user (handled in the background)
+Examples: Password, OTP, fingerprint, face recognition	     Examples: Admin rights, read/write access, role-based permissions

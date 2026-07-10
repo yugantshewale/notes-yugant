@@ -56,3 +56,8 @@ git checkout -b main origin/main    # create local main tracking origin/main
 When you clone and you just want to download the latest commit cuz when you clone a repo all commits are also cloned and its also heavy in size too
 for this you do a shallow commit 
 eg : git clone --depth=1 https://github.com/nakst/gf.git
+
+--------------------------------------------------------------------------------------------------------------------------
+*** Git push conflict ***
+Link -> https://chatgpt.com/c/6a6c7d9e-06d4-83e8-952a-d0d83f25a13b
+Link -> https://chatgpt.com/share/6a6cd32f-7718-83ee-8fd1-94719c44114b

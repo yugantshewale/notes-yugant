@@ -37,7 +37,7 @@ CREATE TABLE person (
 	city VARCHAR(100)
 );
 
-Adding data into a Table using INSERT qquery :
+Adding data into a Table using INSERT query :
 Inserting values into table:
 INSERT INTO <table_name>([Columns that you want to insert data into]) VALUES ([Data for the relative values]);
 eg : INSERT INTO person(id, name, city) VALUES (101, 'Yugant', 'Pune');
@@ -144,7 +144,7 @@ We can also use logical operators here
 eg : SELECT * FROM employee WHERE salary >= 50000 or salary <= 10000; // Gives all rows where salary is >=50000 or salary <= 10000
 eg2 : SELECT * FROM employee WHERE salary >= 50000 and dept = 'HR'; // gives all rows where dept = 'hr' and salary >= '50000'
 
-Different realtional operators
+Different relational operators
 < -> less than
 > -> greater than
 = -> equals to

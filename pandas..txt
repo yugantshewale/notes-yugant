@@ -1,0 +1,97 @@
+Pandas : A python library used for data manuplation and analysis
+Pandas has two main data types 1. Dataframe 2. Series
+	1. DataFrame : A 2D labelled data structure(like a full spreadsheet or SQL table)
+			It allows Label based indexing, col-wise and row-wise operations, support for mixed data types, fast vectorized operations(built on numpy)
+		      eg : data_frame = {
+					'Name' : ['Alice', 'Bob', 'Charlie'],
+					'Age' : [18,24,45],
+					'Country' : ['USA', 'Oman', 'UK']
+		      		  }
+	2. Series : A 1D labelled array (like a column)
+
+How to load dataframe in pandas
+1. To read csv files do this
+	eg : df = pd.read_csv("order.csv")
+2. To read excel sheet do this
+	eg : df = pd.read_excel("order.xslx")
+3. To read from dictionary 
+	eg : df = pd.DataFrame(data_frame)
+
+Note : when we load something with dataframe its automatically going to assign indicies to every single row that gets loaded in.
+
+_______________________________________________________________________________________
+** functions in pandas **
+
+## import pandas and loading ##
+	eg : import pandas as pd
+		 df = read_csv("order.csv")
+
+## head() ##
+head() returns first 5 rows
+	eg : df.head()
+
+## tail() ##
+tail() returns last 5 rows
+	eg : df.tail()
+
+## info() **
+returns info on dataframe
+	eg : df.info()
+
+## describe() ##
+generate descriptive statistics
+gives values that summerizes central tendency, dispersion and shape of a dataset's distribution, excluding NaN values
+	eg : df.describe()
+
+## columns() ##
+returns names of columns
+	eg : df.columns
+
+## index ##
+returns a range of index
+	eg : df.range
+
+## look at data of certian columns data ##
+This returns a series
+	eg : df["column_name"]
+	eg : df[["column_name_1", "column_name_2"]] #return a df object instead
+
+## look at data of certian rows ##
+	eg : df.iloc[0]; #returns data of row 0
+	eg : df.iloc[0][2]; #returns data of row 0 and col 2
+	eg : df.iloc[0]["country"]; #returns data of row 0 and col "country"
+
+## how to apply filters ##
+	eg : df[df['country] == 'France'] # select only those rows where country is france
+
+##applying multiple filters ""
+	eg : df[(df['country'] == 'France') & (df['city'] == 'Paris')] # select only those rows where country is france and city is Paris
+
+## more filters ##
+	eg : df[df["name"].str.startswith('a')]
+
+## filter with some other column instead of index ##
+	eg : df.loc[df['name'] == "yugant"]
+
+
+## Update values in dataframe ##
+Lets say we want to update city of yugant to tokyo
+	eg : df.loc[df['name'] == "yugant", "city"] = "tokyo"
+
+## Update values of column to upper case ##
+	eg : df["country"] = df["country"].str.upper()
+
+## remove entries from dataframe ##
+	eg : df.drop(39) # drops the row with index 39
+
+## delete rows which contain NA or null values ##
+	eg : df.dropna()
+
+## fill all NA values ##
+	eg : df.fillna({"name" : "Anon",}, inplace = True) #inplace = true means modifies existing df and won't return a new one
+
+## rename a column ##
+	eg : df.rename({"name" : "full_name"}, inplace = True)
+
+## Save modified df to some new csv ##
+	eg : df.to_csv("new_csv.csv", index = True)
