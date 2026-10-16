@@ -1,0 +1,48 @@
+Nginx is a web-server that servers web content to our browser
+
+Simple arch
+My comp -> makes a req -> goes to nginx -> nginx sends req to the server
+
+This is known as reverse proxy
+Why cant we directly talk to server ?
+We can do that but it would be a bad idea incase of increase in traffic it would recieve a lot of req and the latency will be low. In this case we need
+to increase the number of server that we have but this presents another problem how do we go to each server . Thats where nginx plays the role we only
+send request to nginx and it does the work of sending the request to the server this is also called load balancer.
+
+Install Nginx:
+just install from the respective package manager
+this is going to create a dir in /user/local/etc/nginx
+We will be workign on with one file called nginx.conf -> a configuration file for configuring nginx the reverse proxy
+
+Some nginx terminologies -> (nginx.conf) file
+Various things exist in nginx.conf one of the things is key value pair
+eg : worker_process 1;
+The curly braces are known as context and within the context you can have directives(key-val pair) for that specific context
+eg : events{
+        worker_connections 1024;
+}
+
+Nginx mime types 
+lets say I want to apply styles to page when nginx serves it, it serves as text/plain instead of text/css 
+for this you will need to add context for the styles  but instead of adding them manually you can use the builtin mime.types 
+eg :
+http {
+        include mime.types # includes all the headers needed
+        server {
+                listen 8080;;
+                root /Projects/sutra-task-manager;
+        }
+}
+
+Location context # think of this like routing or urls.py in Django
+it lives inside of server say i want to server index.html from dail-task directory when user hits '/daily-task' routes then what we will do is 
+http {
+        include mime.types # includes all the headers needed
+        server {
+                listen 8080;;
+                root /Projects/sutra-task-manager;
+                location /daily-task {
+                        root /Projects/sutra-task-manager; # this tells the root directory where the /dail-task dir is located
+                }
+        }
+}

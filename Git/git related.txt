@@ -61,3 +61,7 @@ eg : git clone --depth=1 https://github.com/nakst/gf.git
 *** Git push conflict ***
 Link -> https://chatgpt.com/c/6a6c7d9e-06d4-83e8-952a-d0d83f25a13b
 Link -> https://chatgpt.com/share/6a6cd32f-7718-83ee-8fd1-94719c44114b
+
+---------------------------------------------------------------------------------------------------------------------------
+you explicitly want your local branch to overwrite the remote branch, run:
+git push --force-with-lease origin feat/update-contact

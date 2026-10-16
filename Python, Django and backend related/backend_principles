@@ -1,0 +1,3 @@
+What is routing?
+Routing is the term used to denote the process of mapping URLs to the right controller and to the right actions.
+In other words, it is used to define which method should be executed when a request is received.

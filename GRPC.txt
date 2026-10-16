@@ -1,0 +1,6 @@
+GRPC implements the remote procedure call or RPC model. A paradme in which a client can call methods on a remote server as though the methods were part of the same
+local codebase/
+
+🌸 Protocal Buffers(Protobuffs)
+This is a lang neutral, platform neutral extensible mechanism developed by google for serializing structured data.
+A developer defines a service and the structure of its request and response messages in a ".proto" file using the protobuff syntax.

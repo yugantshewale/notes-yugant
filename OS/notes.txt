@@ -1,0 +1,351 @@
+The OS creates this illusion by virtualizing the CPU.
+
+**Time sharing**
+By running one process, then stopping it and running another, and so forth, the OS can promote the illusion that many virtual CPUs exist when in fact there is
+only one physical CPU (or a few). This basic technique, known as time sharing of the CPU, allows users to run as many concurrent processes as
+they would like; the potential cost is performance, as each will run more slowly if the CPU(s) must be shared.
+
+** Scheduling policy **
+Policies are algorithms for making some kind of decisions within the OS. Eg given a number  of possible programs to run on a CPU which prog should the OS run.
+This is called scheduling policy.
+It will use information like
+- Which prog has run more over last minute
+- Workload knowledge
+- performance metrics
+
+** Address Space **
+the memory that the process can address (called its address space) is part of the process.
+
+** How does process creation actually work? **
+The first thing that the OS must do to run a program is to load its code and any static data (e.g., initialized variables) into memory, into the address space of the process.
+Programs initially reside on disk (or, in some modern systems, flash-based SSDs) in some kind of executable format;thus, the process of loading a program and static
+data into memory requires the OS to read those bytes from disk and place them in memory somewhere
+criptors, and the like in the third part of the book on persistence.By loading the code and static data into memory, by creating and initializing a stack, and by
+doing other work as related to I/O setup, the OS has now (finally) set the stage for program execution.
+
+** Process States **
+•Running: In the running state, a process is running on a processor. This means it is executing instructions.
+• Ready: In the ready state, a process is ready to run but for some reason the OS has chosen not to run it at this given moment.
+• Blocked: In the blocked state, a process has performed some kind of operation that makes it not ready to run until some other event
+takes place. A common example: when a process initiates an I/O request to a disk, it becomes blocked and thus some other process can use the processor.
+Being moved from ready to running means the process has been scheduled; being moved from running to ready means the process has been descheduled.
+
+** Data Structure **
+OS is also a prog. It also has some data structure to track various relevant information.
+To track the state of each process, for example, the OS likely will keep some kind of process list for all processes that are ready, as well as some
+additional information to track which process is currently running.
+The OS must also track, in some way, blocked processes; when an I/O event completes, the OS should make sure to wake the correct process and ready it to
+run again.
+🌸🌸🌸🌸🌸🌸 information an OS needs to track about each process in the xv6 kernel 🌸🌸🌸🌸🌸🌸
+// the registers xv6 will save and restore
+// to stop and subsequently restart a process
+struct context {
+        int eip;
+        int esp;
+        int ebx;
+        int ecx;
+        int edx;
+        int esi;
+        int edi;
+        int ebp;
+};
+
+// the different states a process can be in
+enum proc_state { UNUSED, EMBRYO, SLEEPING,
+RUNNABLE, RUNNING, ZOMBIE };
+
+// the information xv6 tracks about each process
+// including its register context and state
+struct proc {
+        char *mem;
+        // Start of process memory
+
+        uint sz;
+        // Size of process memory
+
+        char *kstack;
+        // Bottom of kernel stack
+        // for this process
+
+        enum proc_state state;
+        // Process state
+
+        int pid;
+        // Process ID
+
+        struct proc *parent;
+        // Parent process
+
+        void *chan;
+        // If non-zero, sleeping on chan
+
+        int killed;
+        // If non-zero, have been killed
+
+        struct file *ofile[NOFILE]; // Open files
+
+        struct inode *cwd;
+        // Current directory
+
+        struct context context;
+        // Switch here to run process
+
+        struct trapframe *tf;
+        // Trap frame for the
+        // current interrupt
+};
+🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸
+From the above code, you can see a couple of important pieces of information the OS tracks about a process. The register context will hold, for
+a stopped process, the contents of its register state. When a process is stopped, its register state will be saved to this memory location; by
+restoring these registers (i.e., placing their values back into the actual physical registers), the OS can resume running the process.
+
+🌸🌸🌸🌸🌸🌸 Process creating 🌸🌸🌸🌸🌸🌸
+
+** fork system call **
+The fork() system call is used to create a new process
+
+** Wait syscall **
+As it turns out, it is quite useful for a parent to wait for a child process to finish what it has been doing.
+This task is accomplished with the wait() system call  (or its more complete sibling waitpid())
+eg :
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<sys/wait.h>
+int main(int argc, char *argv[])
+{
+        printf("hello world (pid:%d)\n", (int) getpid());
+        int rc = fork();
+        if (rc < 0) {
+                 // fork failed; exit
+                fprintf(stderr, "fork failed\n");
+                exit(1);
+        } else if (rc == 0) { // child (new process)
+                printf("hello, I am child (pid:%d)\n", (int) getpid());
+        } else {
+                 // parent goes down this path (main)
+                int wc = wait(NULL);
+                printf("hello, I am parent of %d (wc:%d) (pid:%d)\n",
+                rc, wc, (int) getpid());
+        }
+        return 0;
+}
+In this example (p2.c), the parent process calls wait() to delay its execution until the child finishes executing. When the child is done, wait() returns to the parent.
+💿Adding a wait() call to the code above makes the output deterministic.💿
+With this code, we now know that the child will always print first. Why do we know that? Well, it might simply run first, as before, and thus print before the parent.
+However, if the parent does happen to run first, it will immediately call wait(); this system call won’t return until the child has run and exited 2 . 
+Thus, even when the parent runs first, it politely waits for the child to finish running, then wait() returns, and then the parent prints its message.
+
+** exec() syscall** 
+This system call is useful when you want to run a program that is different from the calling program. For example, calling fork() in above eg is only useful if you want to keep 
+running copies of the same program. However, often you want to run a different program; exec() does just that 
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<string.h>
+#include<sys/wait.h>
+int main(int argc, char *argv[])
+{
+        printf("hello world (pid:%d)\n", (int) getpid());
+        int rc = fork();
+        if (rc < 0) {
+                 // fork failed; exit
+                fprintf(stderr, "fork failed\n");
+                exit(1);
+        } else if (rc == 0) { // child (new process)
+                printf("hello, I am child (pid:%d)\n", (int) getpid());
+                char *myargs[3];
+                myargs[0] = strdup("wc");
+                 // program: "wc" (word count)
+                myargs[1] = strdup("p3.c"); // argument: file to count
+                myargs[2] = NULL;
+                 // marks end of array
+                execvp(myargs[0], myargs); // runs word count
+                printf("this shouldn’t print out");
+        } else {
+                 // parent goes down this path (main)
+                int wc = wait(NULL);
+                printf("hello, I am parent of %d (wc:%d) (pid:%d)\n",
+                rc, wc, (int) getpid());
+        }
+        return 0;
+}
+In this example, the child process calls execvp() in order to run the program wc, which is the word counting program
+🌸Actually, there are six variants of exec(): execl(), execle(), execlp(), execv(), and execvp(). Read the man pages to learn more🌸.
+
+If fork() was strange, exec() is not so normal either. What it does: given the name of an executable (e.g., wc), and some arguments (e.g., p3.c),
+it loads code (and static data) from that executable and overwrites its current code segment (and current static data) with it; the heap and stack and other parts of the memory
+space of the program are reinitialized. Then the OS simply runs that program, passing in any arguments as the argv of that process. Thus, it does not create a new process;
+rather, it transforms the currently running program (formerly p3) into a different running program (wc). After the exec() in the child, it is almost as if p3.c never ran;
+a successful call to exec() never returns.
+
+Why create such an interface ? 
+The separation of fork() and exec() is essential in building a U NIX shell, because it lets the shell run code after the call to fork() but before the call to exec();
+this code can alter the environment of the about-to-be-run program, and thus enables a variety of interesting features to be readily built.
+
+Beyond fork(), exec(), and wait(), there are a lot of other interfaces for interacting with processes in U NIX systems. For example, the kill() system call is used to send signals 
+to a process, including directives to go to sleep, die, and other useful imperatives. In fact, the entire signals subsystem provides a rich infrastructure to deliver external events
+to processes, including ways to receive and process those signals.
+
+** Limited direct execution. **
+The “direct execution” part of the idea is simple: just run the program directly on the CPU. Thus, when the OS wishes to start a program running,
+it creates a process entry for it in a process list, allocates some memory pages for it, loads the program code into memory (from disk)
+locates its entry point (i.e., the main() routine or something similar), jumps to it, and starts running the user’s code.
+This gives rise to few problems
+
+Problem #1: Restricted Operations
+We cannot let users process just access the I/O unrestricted if that happens the process may write on the disk however it wants
+the approach we take is to introduce a new processor mode, known as user mode; code that runs in user mode is restricted in what it can do.
+For example, when running in user mode, a process can’t issue I/O requests; doing so would result in the processor raising an exception;
+the OS would then likely kill the process.
+In contrast to user mode is kernel mode, which the operating system (or kernel) runs in. In this mode, code that runs can do what it likes, including
+privileged operations such as issuing I/O requests and executing all types of restricted instructions.
+
+🌸 what should a user process do when it wishes to perform some kind of privileged operation, such as reading from disk? To enable this, virtually all
+modern hardware provides the ability for user programs to perform a system call.
+System calls allow the kernel to carefully expose certain key pieces of functionality to user programs, such as accessing the file system, creating and
+destroying processes, communicating with other processes, and allocating more memory.
+To execute a system call, a program must execute a special trap instruction. This instruction simultaneously jumps into the kernel and raises the
+privilege level to kernel mode; once in the kernel, the system can now perform whatever privileged operations are needed (if allowed), and thus do
+the required work for the calling process. When finished, the OS calls a special return-from-trap instruction, which, as you might expect, returns
+into the calling user program while simultaneously reducing the privilege level back to user mode.
+
+How does the trap know which code to run inside the OS?
+Clearly, the calling process can’t specify an address to jump to ); doing so would allow programs to jump anywhere into the kernel which clearly is
+bad idea
+The kernel does so by setting up a trap table at boot time. When the machine boots up, it does so in privileged (kernel) mode, and thus is
+free to configure machine hardware as need be. One of the first things the OS thus does is to tell the hardware what code to run when certain
+exceptional events occur.what code should run when a hard-disk interrupt takes place, when a keyboard interrupt occurs, or when program makes a system
+call? The OS informs the hardware of the locations of these trap handlers, usually with some kind of special instruction . Once the hardware is informed, it remembers the location of these handlers until the machine is next rebooted, and thus the hardware knows what to do (i.e., what code to
+jump to) when system calls and other exceptional events take place.
+
+Problem #2: Switching Between Processes
+The next problem with direct execution is achieving a switch between processes
+But it actually is a little bit tricky: specifically, if a process is running on the CPU, this by definition means the OS is not running.
+If the OS is not running, how can it do anything at all
+How can the operating system regain control of the CPU so that it can switch between processes?
+
+1. A Cooperative Approach: Wait For System Calls
+In this style, the OS trusts the processes of the system to behave reasonably. Processes that run for too long are assumed to periodically give up the
+CPU so that the OS can decide to run some other task.
+how does a friendly process give up the CPU in this utopian world?
+Most processes, as it turns out, transfer control of the CPU to the OS quite frequently by making system calls, for example, to open a file and
+subsequently read it, or to send a message to another machine, or to create a new process. Systems like this often include an explicit yield system
+call, which does nothing except to transfer control to the OS so it can run other processes.
+Applications also transfer control to the OS when they do something illegal. For example, if an application divides by zero, or tries to access memory
+that it shouldn’t be able to access, it will generate a trap to the OS. The OS will then have control of the CPU again (and likely terminate the
+offending process).
+Thus, in a cooperative scheduling system, the OS regains control of the CPU by waiting for a system call or an illegal operation of some kind to take
+place.
+What happens, for example, if a process (whether malicious, or just full of bugs) ends up in an infinite loop, and never makes a system call? What can
+the OS do then?
+Without some additional help from the hardware, it turns out the OS can’t do much at all when a process refuses to make system calls (or mistakes) and
+thus return control to the OS. In fact, in the cooperative approach, your only recourse when a process gets stuck in an infinite loop is to resort to
+the age-old solution to all problems in computer systems: reboot the machine.
+
+A Non-Cooperative Approach: The OS Takes Control
+How can the OS gain control of the CPU even if processes are not being cooperative? What can the OS do to ensure a rogue process does not take over the
+machine?
+The answer turns out to be simple and was discovered by a number of people building computer systems many years ago: a timer interrupt
+A timer device can be programmed to raise an interrupt every so many milliseconds; when the interrupt is raised, the currently running process is
+halted, and a pre-configured interrupt handler in the OS runs.At this point, the OS has regained control of the CPU, and thus can do what it pleases:
+stop the current process, and start a different one.the OS must inform the hardware of which code to run when the timer interrupt occurs; thus, at boot
+time, the OS does exactly that.
+Second, also during the boot sequence, the OS must start the timer, which is of course a privileged operation. Once the timer has begun, the OS can
+thus feel safe in that control will eventually be returned to it, and thus the OS is free to run user programs. The timer can also be turned off
+
+⚪⚪Saving and Restoring Context⚪⚪
+Now that the OS has regained control, whether cooperatively via a system call, or more forcefully via a timer interrupt, a decision has to be made:
+whether to continue running the currently-running process, or switch to a different one. This decision is made by a part of the operating system known
+as the scheduler;
+If the decision is made to switch, the OS then executes a low-level piece of code which we refer to as a context switch. A context switch is
+conceptually simple: all the OS has to do is save a few register values for the currently-executing process (onto its kernel stack, for example) and
+restore a few for the soon-to-be-executing process (from its kernel stack). By doing so, the OS thus ensures that when the return-from-trap instruction
+is finally executed, instead of returning to the process that was running, the system resumes execution of another process.
+To save the context of the currently-running process, the OS will execute some low-level assembly code to save the general purpose registers, PC, as
+well as the kernel stack pointer of the currently-running process, and then restore said registers, PC, and switch to the kernel stack for the soon-to-
+be-executing process.
+
+example, Process A is running and then is interrupted by the timer interrupt. The hardware saves its state (onto its kernel stack) and enters the
+kernel (switching to kernel mode). In the timer interrupt handler, the OS decides to switch from running Process A to Process B. At that point, it
+calls the switch() routine, which carefully saves current register values (into the process structure of A), restores the registers of Process B (from
+its process structure entry), and then switches contexts, specifically by changing the stack pointer to use B’s kernel stack (and not A’s). Finally,
+the OS returnsfrom-trap, which restores B’s register state and starts running it.
+
+⚪Note that there are two types of register saves/restores that happen during this protocol. The first is when the timer interrupt occurs; in this
+case, the user register state of the running process is implicitly saved by the hardware, using the kernel stack of that process. The second is when
+the OS decides to switch from A to B; in this case, the kernel register state
+is explicitly saved by the software (i.e., the OS), but this time into memory in the process structure of the process. The latter action moves the
+system from running as if it just trapped into the kernel from A to as if it just trapped into the kernel from B
+🌸🌸🌸🌸🌸🌸The xv6 Context Switch Code🌸🌸🌸🌸🌸🌸
+# void swtch(struct context **old, struct context *new);
+#
+# Save current register context in old
+# and then load register context from new.
+.globl swtch
+swtch:
+# Save old registers
+movl 4(%esp), %eax # put old ptr into eax
+popl 0(%eax)
+ # save the old IP
+movl %esp, 4(%eax) # and stack
+movl %ebx, 8(%eax) # and other registers
+movl %ecx, 12(%eax)
+movl %edx, 16(%eax)
+movl %esi, 20(%eax)
+movl %edi, 24(%eax)
+movl %ebp, 28(%eax)
+# Load new registers
+movl 4(%esp), %eax # put new ptr into eax
+movl 28(%eax), %ebp # restore other registers
+movl 24(%eax), %edi
+movl 20(%eax), %esi
+movl 16(%eax), %edx
+movl 12(%eax), %ecx
+movl 8(%eax), %ebx
+movl 4(%eax), %esp # stack is switched here
+pushl 0(%eax)
+ # return addr put in place
+ret
+🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸
+
+
+
+Note :  Calle saved registers also called non-volatile or call-preserved registers) are CPU registers whose values must be preserved across function
+calls.
+(related to kernel stack and stuff) --> https://chatgpt.com/share/6acf8082-a25c-83e8-bb96-7912e46c1fa6
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

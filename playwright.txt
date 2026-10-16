@@ -1,0 +1,112 @@
+Playwright is used to test websites
+💿How to add Playwright💿
+    mkdir playwright-tests
+    cd playwright-tests
+    npm init playwright@latest
+
+Playwright will ask you some questions. I'd choose:
+    Language:        TypeScript
+    Tests directory: tests
+    GitHub Actions:  No
+    Install browsers: Yes
+    Install Dependency: No
+
+Directory Structure:
+    playwright-tests/
+    ├── node_modules/
+    ├── tests/
+    │   └── example.spec.js
+    ├── package.json
+    ├── package-lock.json
+    └── playwright.config.js
+
+
+💿Test your feature using Codegen💿
+
+Step 1 :
+    Suppose your application is running at: http://localhost:3000
+    Then Run: npx playwright codegen http://localhost:3000
+
+    🌸Playwright will open:
+        A browser
+        A Playwright Inspector
+        You interact with the browser normally, and Playwright generates the test code as you interact with the application.
+        For example, imagine you're testing:
+            Login
+            ↓
+            Dashboard
+            ↓
+            Users
+            ↓
+            Add User
+            ↓
+            Fill user information
+            ↓
+            Create
+            ↓
+            Verify user exists
+        You simply perform those actions in the browser.
+    🌸Playwright will generate a code like this:
+        import { test, expect } from '@playwright/test';
+        test('create user', async ({ page }) => {
+            await page.goto('http://localhost:3000');
+
+            await page.getByLabel('Username').fill('yugant');
+            await page.getByLabel('Password').fill('password');
+
+            await page.getByRole('button', { name: 'Login' }).click();
+
+            await page.getByRole('link', { name: 'Users' }).click();
+
+            await page.getByRole('button', { name: 'Add User' }).click();
+
+            await page.getByLabel('Name').fill('Yugant');
+
+            await page.getByRole('button', { name: 'Create' }).click();
+
+            await expect(page.getByText('Yugant')).toBeVisible();
+        });
+
+Step 2 :
+    Create: tests/create-user.spec.js
+    And put the generated test in there.
+
+Step 3 :
+    🌸 To run test : npx playwright test
+    Playwright will execute the test automatically. By default, tests run headlessly, so you won't necessarily see the browser.
+
+    🌸 If you want to watch the browser
+    run: npx playwright test --headed
+
+    🌸 See a nice test UI
+    You can also run: npx playwright test --ui
+
+    🌸 To run one worker of browser at a time use
+    command eg :  npx playwright test tests/add-client.spec.ts --workers=1 --headed
+
+    🌸 To run one task 10 times
+    command eg : npx playwright test tests/add-task.spec.ts --project=chromium --headed --repeat-each=10
+
+_____________________________________________________________________________________________________________________________________________
+Codegen Locator Generators
+Codegen Generated Brittle Locators
+When you use Playwright Codegen, it records row locators by concatenating the visible text of every column in that row:
+Row Name = Category Name + Subcategory Count + Description + Action Button Labels
+_____________________________________________________________________________________________________________________________________________
+Record Videos in playwright
+do this to make a flag in cli
+default defineConfig({
+  use: {
+    video: process.env.PW_VIDEO === 'on' ? 'on' : 'off',
+  },
+});
+code : npx playwright test --video=on
+
+
+
+
+
+
+
+
+

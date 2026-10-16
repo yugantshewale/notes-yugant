@@ -1,0 +1,76 @@
+SystemD is also know as "INIT SYSTEM" which acts like a manager for your file system. INIT as in initalization i.e when power on -> kernel loads -> kernel launches the first userspace process or program called init with PID = 1 cuz this is the first process and this process is responsible for bringing in the rest of the system
+Primary Function:
+    ⚪Manage System Services and background process often called demons(services that run in the background without an interface)
+    ⚪Managing services may include things like: starting, stopping, reloading, monitoring, starting at boot
+    ⚪These services may include things like SSH or webserver like NGINX.
+    ⚪ SystemD ensures they are maintained, runnign and much more
+
+How are services managed (systemctl) ?
+We do so using someething called systemctl. Whenever need to manage or lookup the state of service use systemctl
+Always put d at end of cmd . Here are few commands to use
+- sudo systemctl start sshd -> this starts service right now (If I restart i have to manually turn it on again)
+- sudo systemctl enable sshd -> Starts the process automatically when you boot the PC
+- sudo systemctl disable sshd -> disable the process from starting automatically
+- sudo systemctl reload sshd -> Reload is used when service can reload its config file without having to restart the service
+- sudo systemctil restart sshd -> Restarts the service
+But if you aren't should what to use (reload or restart) use - sudo system reload-or-restart sshd
+
+SystemD UNITS
+uints are objs that systemd can interact with such as  .services eg sudo systemd start sshd.service
+there are many others like .socket, .timer, .mount, .target
+Each unit has a file called unitfile it is a plain text file which follows a particular format and describes a service or socket eg .socket has a file
+
+Unit file
+A plain txt file that follows a particular format and it describes a service or a socket or anything that systemd can interact with known as unit
+How system unit file looks like
+cmd - systemctl cat shhd
+output -
+---------------------------------------------------------------------
+# /usr/lib/systemd/system/sshd.service
+[Unit]
+Description=OpenSSH server daemon
+Documentation=man:sshd(8) man:sshd_config(5)
+After=network.target sshd-keygen.target
+Wants=sshd-keygen.target
+# Migration for Fedora 38 change to remove group ownership for standard host keys
+# See https://fedoraproject.org/wiki/Changes/SSHKeySignSuidBit
+Wants=ssh-host-keys-migration.service
+
+[Service]
+Type=notify
+# Set option as empty variable to suppress warnings upon expanding the command line
+# when the config file under /etc does not exist or is empty.
+Environment=OPTIONS=
+EnvironmentFile=-/etc/sysconfig/sshd
+ExecStart=/usr/sbin/sshd -D $OPTIONS
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=on-failure
+RestartSec=42s
+
+[Install]
+WantedBy=multi-user.target
+
+# /usr/lib/systemd/system/service.d/10-timeout-abort.conf
+# This file is part of the systemd package.
+# See https://fedoraproject.org/wiki/Changes/Shorter_Shutdown_Timer.
+#
+# To facilitate debugging when a service fails to stop cleanly,
+# TimeoutStopFailureMode=abort is set to "crash" services that fail to stop in
+# the time allotted. This will cause the service to be terminated with SIGABRT
+# and a coredump to be generated.
+#
+# To undo this configuration change, create a mask file:
+#   sudo mkdir -p /etc/systemd/system/service.d
+#   sudo ln -sv /dev/null /etc/systemd/system/service.d/10-timeout-abort.conf
+
+[Service]
+TimeoutStopFailureMode=abort
+---------------------------------------------------------------------
+where are these files stored ?
+[main place where it is stored] - > /usr/lib/systemd/system/
+[temporary - unit files created at runtime] -> /run/systemd/system/
+[custom ones - /etc/systemd/systems] -> /etc/systemd/system/
+
+
+
